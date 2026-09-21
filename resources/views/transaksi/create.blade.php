@@ -12,7 +12,7 @@
         {{-- Header --}}
         <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
             <div>
-                <h3 class="font-bold text-lg text-slate-800">Tambah Transaksi Baru</h3>
+                <h3 id="modalTitle" class="font-bold text-lg text-slate-800">Tambah Transaksi Baru</h3>
             </div>
             <button type="button" onclick="closeModal()" class="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
