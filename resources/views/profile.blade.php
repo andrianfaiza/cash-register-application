@@ -11,7 +11,7 @@
         $user->nama = $user->nama ?? $user->name ?? 'Pengguna';
         $user->jabatan = $user->jabatan ?? 'Finance Admin';
         $user->status = $user->status ?? 'Aktif';
-        $user->foto = $user->foto ?? 'https://i.pravatar.cc/160?img=47';
+        $user->foto = $user->foto ?? 'no-profile.jpg';
         $user->telepon = $user->telepon ?? '-';
         $user->nip = $user->nip ?? '-';
         $user->departemen = $user->departemen ?? 'Finance & Accounting';
@@ -156,48 +156,7 @@
                     </div>
                 </form>
 
-                {{-- 2FA --}}
-                <div>
-                    <p class="text-sm font-semibold text-slate-700 mb-3">Autentikasi Dua Faktor (2FA)</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <label class="cursor-pointer">
-                            <input type="radio" name="metode_2fa" value="authenticator" class="peer hidden">
-                            <div class="border-2 border-slate-200 peer-checked:border-slate-900 rounded-xl p-4 flex items-start gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                                </svg>
-                                <div>
-                                    <p class="text-sm font-semibold text-slate-800">Google Authenticator</p>
-                                    <p class="text-xs text-slate-400 mt-0.5">Kode OTP dari aplikasi authenticator.</p>
-                                </div>
-                            </div>
-                        </label>
-                        <label class="cursor-pointer">
-                            <input type="radio" name="metode_2fa" value="sms_email" class="peer hidden">
-                            <div class="border-2 border-slate-200 peer-checked:border-slate-900 rounded-xl p-4 flex items-start gap-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-slate-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                                <div>
-                                    <p class="text-sm font-semibold text-slate-800">SMS / Email</p>
-                                    <p class="text-xs text-slate-400 mt-0.5">Kode OTP dikirim ke nomor atau email terdaftar.</p>
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-
-                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
-                        <div>
-                            <p class="text-sm font-medium text-slate-700">Aktifkan Autentikasi Dua Faktor</p>
-                            <p class="text-xs text-slate-400 mt-0.5">Pilih salah satu metode di atas sebelum mengaktifkan.</p>
-                        </div>
-                        <button type="button" id="toggle2FA" onclick="toggleSwitch('toggle2FA')"
-                            class="relative w-9 h-5 rounded-full transition-colors bg-slate-300 shrink-0">
-                            <span class="knob absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-0.5"></span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+            
 
             {{-- 4. AKTIVITAS & RIWAYAT LOGIN --}}
             <div class="bg-white rounded-xl border border-slate-200 p-6">
