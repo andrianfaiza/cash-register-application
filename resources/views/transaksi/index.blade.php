@@ -29,12 +29,26 @@
                         </select>
                         <form id="transactionFilters" method="GET" action="{{ route('transaksi') }}"></form>
                     </div>
-                    <button onclick="openModal()" type="button" class="inline-flex items-center gap-2 bg-slate-950 hover:bg-slate-800 text-white text-sm font-medium px-4 py-2.5 rounded-lg">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-                        </svg>
-                        Tambah Transaksi Baru
-                    </button>
+                    <div class="flex justife-between gap-3">
+                        <button
+                                type="button"
+                                onclick="toggleHapusMode()"
+                                id="btnHapusTransaksi"
+                                title="Hapus Transaksi"
+                                class="flex items-center gap-2 bg-white hover:bg-red-50 text-red-500 border border-red-200 hover:border-red-300 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Hapus
+                            </button>
+                        <button onclick="openModal()" type="button" class="inline-flex items-center gap-2 bg-slate-950 hover:bg-slate-800 text-white text-sm font-medium px-4 py-2.5 rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Tambah Transaksi Baru
+                        </button>
+                    </div>
                 </div>
 
                 {{-- TABLE CARD --}}
@@ -47,17 +61,24 @@
                         <table class="w-full text-sm">
                             <thead>
                                 <tr class="text-left text-xs text-slate-400 uppercase tracking-wide">
+                                    <th class="px-3 py-3 font-medium hapus-col hidden w-10">
+                                        <input type="checkbox" id="selectAllTransaksi" onchange="toggleSelectAllTransaksi(this)" class="rounded border-slate-300">
+                                    </th>
                                     <th class="px-6 py-3 font-medium">Tanggal</th>
                                     <th class="px-6 py-3 font-medium">Deskripsi</th>
                                     <th class="px-6 py-3 font-medium">Kategori</th>
                                     <th class="px-6 py-3 font-medium">Proyek</th>
                                     <th class="px-6 py-3 font-medium">Status</th>
                                     <th class="px-6 py-3 font-medium text-right">Nominal</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-100">
                                 @foreach ($transactions as $transaction)
                                     <tr class="hover:bg-slate-50">
+                                        <td class="px-3 py-4 hapus-col hidden">
+                                            <input type="checkbox" name="transaksi_ids[]" value="{{ $transaction->id }}" class="transaksi-checkbox rounded border-slate-300">
+                                        </td>
                                         <td class="px-6 py-4 text-slate-500 whitespace-nowrap">{{ $transaction->tanggal->format('d M Y') }}</td>
                                         <td class="px-6 py-4 font-medium text-slate-800">{{ $transaction->deskripsi ?: 'Tanpa deskripsi' }}</td>
                                         <td class="px-6 py-4 font-medium text-orange-500 whitespace-nowrap">{{ ucfirst($transaction->kategori) }}</td>
@@ -69,6 +90,18 @@
                                         </td>
                                         <td class="px-6 py-4 text-right font-semibold whitespace-nowrap {{ $transaction->tipe === 'keluar' ? 'text-red-500' : 'text-emerald-600' }}">
                                             {{ $transaction->tipe === 'keluar' ? '- ' : '+ ' }}Rp {{ number_format($transaction->nominal, 0, ',', '.') }}
+                                        </td>
+                                        <td>
+                                            <button
+                                                    type="button"
+                                                    title="Edit Transaksi"
+                                                    onclick="editTransaksi({{ $transaction->id }})"
+                                                    class="w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                    </svg>
+                                                </button>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -91,6 +124,21 @@
                     </div>
                 </div>
 
-                @include('transaksi.create');
+                @include('transaksi.create')
+
+                <form id="deleteTransaksiForm" method="POST" action="{{ route('transaksi.destroy') }}" class="hidden">
+                    @csrf
+                    @method('DELETE')
+                    <div id="deleteTransaksiIds"></div>
+                </form>
+
+                <script id="transaksiData" type="application/json">@json($transaksiData)</script>
+                <script>
+                    window.transaksiRoutes = {
+                        store: @json(route('transaksi.store')),
+                        update: @json(url('transaksi')),
+                        destroy: @json(route('transaksi.destroy')),
+                    };
+                </script>
 
 @endsection

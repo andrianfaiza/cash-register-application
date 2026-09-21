@@ -15,9 +15,13 @@ Route::get('/dashboard', [KasController::class, 'dashboard'])->name('dashboard')
 
 Route::get('transaksi', [KasController::class, 'transactions'])->name('transaksi');
 Route::post('transaksi', [KasController::class, 'storeTransaction'])->name('transaksi.store');
+Route::put('transaksi/{transaction}', [KasController::class, 'updateTransaction'])->name('transaksi.update');
+Route::delete('transaksi', [KasController::class, 'destroyTransactions'])->name('transaksi.destroy');
 
 Route::get('proyek', [KasController::class, 'projects'])->name('proyek');
 Route::post('proyek', [KasController::class, 'storeProject'])->name('proyek.store');
+Route::put('proyek/{project}', [KasController::class, 'updateProject'])->name('proyek.update');
+Route::delete('proyek', [KasController::class, 'destroyProjects'])->name('proyek.destroy');
 
 Route::get('laporan', [KasController::class, 'reports'])->name('laporan');
 

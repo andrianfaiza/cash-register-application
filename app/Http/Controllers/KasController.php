@@ -12,6 +12,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
@@ -97,8 +98,21 @@ class KasController extends Controller
         $query->when($request->filled('kategori'), fn ($builder) => $builder->where('kategori', $request->string('kategori')));
         $query->when($request->filled('status'), fn ($builder) => $builder->where('status', $request->string('status')));
 
+        $transactions = $query->latest('tanggal')->latest('id')->paginate(15)->withQueryString();
+
         return view('transaksi.index', [
-            'transactions' => $query->latest('tanggal')->latest('id')->paginate(15)->withQueryString(),
+            'transactions' => $transactions,
+            'transaksiData' => $transactions->getCollection()->map(fn (Transaction $t) => [
+                'id' => $t->id,
+                'tipe' => $t->tipe,
+                'nominal' => $t->nominal,
+                'tanggal' => $t->tanggal->format('Y-m-d'),
+                'kategori' => $t->kategori,
+                'proyek_id' => $t->proyek_id,
+                'deskripsi' => $t->deskripsi,
+                'rekening_id' => $t->rekening_id,
+                'verifikasi_langsung' => $t->verifikasi_langsung,
+            ])->values(),
             'accountOptions' => Transaction::query()->whereNotNull('rekening_id')->distinct()->orderBy('rekening_id')->pluck('rekening_id'),
             'categoryOptions' => Transaction::query()->whereNotNull('kategori')->distinct()->orderBy('kategori')->pluck('kategori'),
             'projects' => Project::query()->where('status', 'aktif')->orderBy('nama_proyek')->get(),
@@ -136,6 +150,53 @@ class KasController extends Controller
         return redirect()->route('transaksi')->with('success', 'Transaksi berhasil disimpan.');
     }
 
+    public function updateTransaction(Request $request, Transaction $transaction): RedirectResponse
+    {
+        $data = $request->validate([
+            'tipe' => ['required', 'in:masuk,keluar'],
+            'nominal' => ['required', 'integer', 'min:1'],
+            'tanggal' => ['required', 'date'],
+            'kategori' => ['required', 'in:operasional,proyek,gaji,pajak,pendapatan,bunga_bank,injeksi_modal,pinjaman'],
+            'proyek_id' => ['nullable', 'integer', 'exists:projects,id'],
+            'deskripsi' => ['nullable', 'string', 'max:1000'],
+            'rekening_id' => ['nullable', 'string', 'max:100'],
+            'verifikasi_langsung' => ['required', 'boolean'],
+            'bukti' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+        ]);
+
+        if ($request->hasFile('bukti')) {
+            if ($transaction->bukti) {
+                Storage::disk('public')->delete($transaction->bukti);
+            }
+            $data['bukti'] = $request->file('bukti')->store('bukti-transaksi', 'public');
+        }
+
+        $data['status'] = $request->boolean('verifikasi_langsung') ? 'Sukses' : 'Pending';
+        $transaction->update($data);
+
+        return redirect()->route('transaksi')->with('success', 'Transaksi berhasil diperbarui.');
+    }
+
+    public function destroyTransactions(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:transactions,id'],
+        ]);
+
+        $transactions = Transaction::query()->whereIn('id', $request->input('ids'))->get();
+
+        foreach ($transactions as $transaction) {
+            if ($transaction->bukti) {
+                Storage::disk('public')->delete($transaction->bukti);
+            }
+        }
+
+        Transaction::query()->whereIn('id', $request->input('ids'))->delete();
+
+        return redirect()->route('transaksi')->with('success', count($request->input('ids')) . ' transaksi berhasil dihapus.');
+    }
+
     public function projects(): View
     {
         $projects = Project::query()->latest()->get()->map(function (Project $project) {
@@ -148,6 +209,17 @@ class KasController extends Controller
 
         return view('proyek.index', [
             'projects' => $projects,
+            'proyekData' => $projects->map(fn (Project $p) => [
+                'id' => $p->id,
+                'nama_proyek' => $p->nama_proyek,
+                'kategori_proyek' => $p->kategori_proyek,
+                'deskripsi' => $p->deskripsi,
+                'pagu_anggaran' => $p->pagu_anggaran,
+                'tanggal_mulai' => $p->tanggal_mulai?->format('Y-m-d'),
+                'tanggal_selesai' => $p->tanggal_selesai?->format('Y-m-d'),
+                'project_lead_id' => $p->project_lead_id,
+                'departemen' => $p->departemen ?? [],
+            ])->values(),
             'users' => User::query()->orderBy('name')->get(['id', 'name']),
             'totalBudget' => $totalBudget,
             'totalSpent' => $totalSpent,
@@ -197,6 +269,37 @@ class KasController extends Controller
         Project::create($data);
 
         return redirect()->route('proyek')->with('success', 'Proyek berhasil dibuat.');
+    }
+
+    public function updateProject(Request $request, Project $project): RedirectResponse
+    {
+        $data = $request->validate([
+            'nama_proyek' => ['required', 'string', 'max:255'],
+            'kategori_proyek' => ['required', 'string', 'max:100'],
+            'deskripsi' => ['nullable', 'string', 'max:2000'],
+            'pagu_anggaran' => ['required', 'integer', 'min:0'],
+            'tanggal_mulai' => ['nullable', 'date'],
+            'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
+            'project_lead_id' => ['nullable', 'integer'],
+            'departemen' => ['nullable', 'array'],
+            'departemen.*' => ['string', 'max:100'],
+        ]);
+
+        $project->update($data);
+
+        return redirect()->route('proyek')->with('success', 'Proyek berhasil diperbarui.');
+    }
+
+    public function destroyProjects(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:projects,id'],
+        ]);
+
+        Project::query()->whereIn('id', $request->input('ids'))->delete();
+
+        return redirect()->route('proyek')->with('success', count($request->input('ids')) . ' proyek berhasil dihapus.');
     }
 
     public function settings(): View
