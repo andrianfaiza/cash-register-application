@@ -214,4 +214,79 @@ function handleTransaksiSubmit() {
     return true;
 }
 
+function openDetailModal(id) {
+    const data = transaksiMap[id];
+    if (!data) return;
+
+    const isMasuk = data.tipe === 'masuk';
+    const badgeTipe = document.getElementById('detailBadgeTipe');
+    badgeTipe.textContent = isMasuk ? 'IN' : 'OUT';
+    badgeTipe.className = `inline-flex items-center justify-center w-9 h-9 rounded-xl font-bold text-sm ${isMasuk ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400'}`;
+
+    document.getElementById('detailTanggal').textContent = data.tanggal_formatted || data.tanggal;
+    
+    const nominalEl = document.getElementById('detailNominal');
+    nominalEl.textContent = `${isMasuk ? '+' : '-'} Rp ${Number(data.nominal).toLocaleString('id-ID')}`;
+    nominalEl.className = `text-2xl font-black ${isMasuk ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400'}`;
+
+    document.getElementById('detailKategori').textContent = (data.kategori || '-').toUpperCase();
+    document.getElementById('detailProyek').textContent = data.proyek_nama || 'Non-Proyek';
+    document.getElementById('detailRekening').textContent = data.rekening_id || 'KAS BESAR';
+
+    const statusEl = document.getElementById('detailStatus');
+    statusEl.textContent = data.status || 'Sukses';
+    statusEl.className = `inline-block font-semibold px-2.5 py-1 rounded-full text-xs ${data.status === 'Sukses' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400' : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400'}`;
+
+    document.getElementById('detailDeskripsi').textContent = data.deskripsi || 'Tidak ada deskripsi.';
+
+    const noBukti = document.getElementById('detailNoBukti');
+    const buktiContent = document.getElementById('detailBuktiContent');
+    const buktiImg = document.getElementById('detailBuktiImg');
+    const buktiLink = document.getElementById('detailBuktiLink');
+
+    if (data.bukti) {
+        noBukti.classList.add('hidden');
+        buktiContent.classList.remove('hidden');
+        buktiContent.classList.add('flex');
+        buktiLink.href = data.bukti;
+
+        const isImage = data.bukti.match(/\.(jpeg|jpg|gif|png|webp)$/i);
+        if (isImage) {
+            buktiImg.src = data.bukti;
+            buktiImg.classList.remove('hidden');
+        } else {
+            buktiImg.classList.add('hidden');
+        }
+    } else {
+        noBukti.classList.remove('hidden');
+        buktiContent.classList.add('hidden');
+        buktiContent.classList.remove('flex');
+    }
+
+    const modal = document.getElementById('detailModal');
+    const backdrop = document.getElementById('detailModalBackdrop');
+    const box = document.getElementById('detailModalBox');
+
+    modal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+        backdrop.classList.remove('opacity-0');
+        box.classList.remove('opacity-0', 'scale-95');
+    });
+    document.body.classList.add('overflow-hidden');
+}
+
+function closeDetailModal() {
+    const modal = document.getElementById('detailModal');
+    const backdrop = document.getElementById('detailModalBackdrop');
+    const box = document.getElementById('detailModalBox');
+
+    backdrop.classList.add('opacity-0');
+    box.classList.add('opacity-0', 'scale-95');
+
+    setTimeout(() => {
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }, 200);
+}
+
 document.addEventListener('DOMContentLoaded', initTransaksiData);

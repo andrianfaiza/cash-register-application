@@ -3,7 +3,7 @@
 
     <!-- Tombol Profil -->
     <button type="button" onclick="toggleAccountMenu()" class="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-800 transition w-full text-left">
-        <img src="{{ auth()->user()?->foto ? asset('storage/' . auth()->user()->foto) : 'no-profile.jpg' }}" alt="{{ auth()->user()?->name ?? 'Pengguna' }}" class="w-9 h-9 rounded-full object-cover">
+        <img src="{{ auth()->user()?->foto ? (str_starts_with(auth()->user()->foto, 'foto-profil') ? asset('storage/' . auth()->user()->foto) : asset(auth()->user()->foto)) : asset('no-profile.jpg') }}" alt="{{ auth()->user()?->name ?? 'Pengguna' }}" class="w-9 h-9 rounded-full object-cover">
         <div class="flex-1 min-w-0">
             <p class="text-sm font-semibold leading-tight text-white truncate">{{ auth()->user()?->name ?? 'Pengguna' }}</p>
             <p class="text-xs text-slate-400 truncate">{{ auth()->user()?->departemen ?? 'Finance Admin' }}</p>

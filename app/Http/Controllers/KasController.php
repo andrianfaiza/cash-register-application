@@ -107,11 +107,15 @@ class KasController extends Controller
                 'tipe' => $t->tipe,
                 'nominal' => $t->nominal,
                 'tanggal' => $t->tanggal->format('Y-m-d'),
+                'tanggal_formatted' => $t->tanggal->format('d M Y'),
                 'kategori' => $t->kategori,
                 'proyek_id' => $t->proyek_id,
+                'proyek_nama' => $t->project?->nama_proyek ?? 'Non-Proyek',
                 'deskripsi' => $t->deskripsi,
                 'rekening_id' => $t->rekening_id,
+                'status' => $t->status,
                 'verifikasi_langsung' => $t->verifikasi_langsung,
+                'bukti' => $t->bukti ? asset('storage/' . $t->bukti) : null,
             ])->values(),
             'accountOptions' => Transaction::query()->whereNotNull('rekening_id')->distinct()->orderBy('rekening_id')->pluck('rekening_id'),
             'categoryOptions' => Transaction::query()->whereNotNull('kategori')->distinct()->orderBy('kategori')->pluck('kategori'),
@@ -337,6 +341,21 @@ class KasController extends Controller
     {
         $user = $request->user();
 
+        if ($request->hasFile('foto_profil')) {
+            $request->validate([
+                'foto_profil' => ['required', 'image', 'max:5120'],
+            ]);
+
+            if ($user->foto && Storage::disk('public')->exists($user->foto)) {
+                Storage::disk('public')->delete($user->foto);
+            }
+
+            $path = $request->file('foto_profil')->store('foto-profil', 'public');
+            $user->update(['foto' => $path]);
+
+            return redirect()->route('profile')->with('success', 'Foto profil berhasil diperbarui.');
+        }
+
         if ($request->filled('current_password')) {
             $request->validate([
                 'current_password' => ['required', 'current_password'],
@@ -353,17 +372,83 @@ class KasController extends Controller
             'telepon' => ['nullable', 'string', 'max:50'],
             'nip' => ['nullable', 'string', 'max:100'],
             'departemen' => ['nullable', 'string', 'max:150'],
-            'foto_profil' => ['nullable', 'image', 'max:5120'],
         ]);
-
-        if ($request->hasFile('foto_profil')) {
-            $data['foto'] = $request->file('foto_profil')->store('foto-profil', 'public');
-        }
-        unset($data['foto_profil']);
 
         $user->update($data);
 
         return redirect()->route('profile')->with('success', 'Profil berhasil diperbarui.');
+    }
+
+    public function search(Request $request): View
+    {
+        $query = trim($request->input('q', ''));
+
+        $transactions = collect();
+        $projects = collect();
+
+        if ($query !== '') {
+            $transactions = Transaction::query()
+                ->where('deskripsi', 'like', "%{$query}%")
+                ->orWhere('kategori', 'like', "%{$query}%")
+                ->orWhere('rekening_id', 'like', "%{$query}%")
+                ->latest('tanggal')
+                ->get();
+
+            $projects = Project::query()
+                ->where('nama_proyek', 'like', "%{$query}%")
+                ->orWhere('kategori_proyek', 'like', "%{$query}%")
+                ->orWhere('deskripsi', 'like', "%{$query}%")
+                ->latest()
+                ->get();
+        }
+
+        return view('search', compact('query', 'transactions', 'projects'));
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $transactions = Transaction::query()->with('project')->latest('tanggal')->get();
+        $filename = 'laporan-kas-' . now()->format('Y-m-d') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($transactions) {
+            $file = fopen('php://output', 'w');
+            fputs($file, "\xEF\xBB\xBF");
+            fputcsv($file, ['ID', 'Tanggal', 'Tipe', 'Kategori', 'Proyek', 'Rekening', 'Status', 'Nominal', 'Deskripsi']);
+
+            foreach ($transactions as $t) {
+                fputcsv($file, [
+                    $t->id,
+                    $t->tanggal->format('Y-m-d'),
+                    ucfirst($t->tipe),
+                    ucfirst($t->kategori),
+                    $t->project?->nama_proyek ?? 'Non-Proyek',
+                    $t->rekening_id ?? '-',
+                    $t->status,
+                    $t->nominal,
+                    $t->deskripsi,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function exportPdf(Request $request): View
+    {
+        $start = now()->startOfMonth();
+        $end = now()->endOfMonth();
+        $transactions = Transaction::query()->whereBetween('tanggal', [$start, $end])->where('status', 'Sukses')->latest('tanggal')->get();
+        $totalMasuk = $transactions->where('tipe', 'masuk')->sum('nominal');
+        $totalKeluar = $transactions->where('tipe', 'keluar')->sum('nominal');
+
+        return view('laporan.pdf', compact('start', 'end', 'transactions', 'totalMasuk', 'totalKeluar'));
     }
 
     public function logout(Request $request): RedirectResponse
