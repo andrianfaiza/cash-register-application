@@ -7,7 +7,7 @@
     <div id="proyekModalBackdrop" onclick="closeProyekModal()" class="modal-backdrop fixed inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0"></div>
 
     {{-- Modal Box --}}
-    <div id="proyekModalBox" class="modal-box relative bg-white dark:bg-slate-900 dark:border dark:border-slate-800 rounded-2xl shadow-xl w-full max-w-lg z-10 overflow-hidden transform scale-95 opacity-0">
+    <div id="proyekModalBox" class="modal-box relative bg-white dark:bg-slate-900 dark:border dark:border-slate-800 rounded-2xl shadow-xl w-full max-w-[750px] z-10 overflow-hidden transform scale-95 opacity-0">
 
         <form id="proyekForm" method="POST" action="{{ route('proyek.store') }}" onsubmit="return handleProyekSubmit(event)">
             @csrf

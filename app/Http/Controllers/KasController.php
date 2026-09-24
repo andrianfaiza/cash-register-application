@@ -52,7 +52,7 @@ class KasController extends Controller
             $end = $start->copy()->endOfWeek();
 
             return [
-                'label' => 'M' . (5 - $offset),
+                'label' => 'Minggu ' . (5 - $offset),
                 'masuk' => (clone $successful)->where('tipe', 'masuk')->whereBetween('tanggal', [$start, $end])->sum('nominal'),
                 'keluar' => (clone $successful)->where('tipe', 'keluar')->whereBetween('tanggal', [$start, $end])->sum('nominal'),
             ];

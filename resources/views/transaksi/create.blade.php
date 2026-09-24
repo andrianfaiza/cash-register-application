@@ -7,7 +7,7 @@
     <div id="modalBackdrop" onclick="closeModal()" class="modal-backdrop fixed inset-0 bg-slate-900/40 backdrop-blur-sm opacity-0"></div>
 
     {{-- Modal Box --}}
-    <div id="modalBox" class="modal-box relative bg-white dark:bg-slate-900 dark:border dark:border-slate-800 rounded-2xl shadow-xl w-full max-w-md z-10 overflow-hidden transform scale-95 opacity-0">
+    <div id="modalBox" class="modal-box relative bg-white dark:bg-slate-900 dark:border dark:border-slate-800 rounded-2xl shadow-xl w-full max-w-[600px] z-10 overflow-hidden transform scale-95 opacity-0">
 
         {{-- Header --}}
         <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-950/50">

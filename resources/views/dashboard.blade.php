@@ -33,7 +33,7 @@
 </div>
 
 {{-- CHART + REKENING --}}
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+<div class="gap-5">
 
     {{-- Tren Arus Kas Mingguan --}}
     <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
@@ -57,25 +57,6 @@
             @endforeach
         </div>
     </div>
-
-    {{-- Daftar Rekening Kas --}}
-    <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
-        <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4">Daftar Rekening Kas</h2>
-        <div class="space-y-4">
-            @forelse ($accounts as $account)
-                <div class="pb-4 {{ !$loop->last ? 'border-b border-slate-100 dark:border-slate-800' : '' }}">
-                    <div class="flex items-center justify-between">
-                        <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">{{ $account->rekening_id }}</p>
-                        <span class="text-[11px] font-medium text-orange-500">Saldo berjalan</span>
-                    </div>
-                    <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Rekening transaksi</p>
-                    <p class="text-sm font-bold text-slate-900 dark:text-slate-100 mt-1">Rp {{ number_format($account->saldo, 0, ',', '.') }}</p>
-                </div>
-            @empty
-                <p class="text-sm text-slate-400">Belum ada transaksi rekening.</p>
-            @endforelse
-        </div>
-    </div>
 </div>
 
 {{-- TRANSAKSI TERBARU + ALOKASI PROYEK --}}
@@ -83,7 +64,10 @@
 
     {{-- Transaksi Terbaru --}}
     <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
-        <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4">Transaksi Terbaru</h2>
+        <div class="flex justify-between gap-3">
+            <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4">Transaksi Terbaru</h2>
+            <a class="text-xs underline" href="{{ route('transaksi')}}">Lihat Detail</a>
+        </div>
         <div class="space-y-4">
             @forelse ($recentTransactions as $transaction)
                 <div class="flex items-center justify-between">
@@ -103,7 +87,10 @@
 
     {{-- Alokasi Proyek Aktif --}}
     <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
-        <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4">Alokasi Proyek Aktif</h2>
+        <div class="flex justify-between gap-3`">
+            <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-4">Alokasi Proyek Aktif</h2>
+            <a class="text-xs underline" href="{{ route('proyek')}}">Lihat Detail</a>
+        </div>
         <div class="space-y-4">
             @forelse ($activeProjects as $project)
                 <div>
