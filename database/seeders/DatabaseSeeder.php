@@ -16,12 +16,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Admin',
-            'email' => 'admin@gmail.com',
-            'password' => Hash::make('12345678'), // Menggunakan Hash::make() atau bcrypt('password123')
+        $this->call([
+            KasSeeder::class,
         ]);
     }
 }
