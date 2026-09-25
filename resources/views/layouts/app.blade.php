@@ -36,7 +36,7 @@
             </header>
 
             {{-- CONTENT --}}
-            <main class="flex-1 px-8 py-4 space-y-4 overflow-y-auto">
+            <main class="flex-1 px-8 py-3 space-y-4 overflow-y-auto">
                 @yield('content')
             </main>
         </div>
