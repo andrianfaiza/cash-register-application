@@ -35,7 +35,7 @@
                     <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
                         @forelse ($transactions as $t)
                             <tr>
-                                <td class="py-3 text-slate-500 whitespace-nowrap">{{ $t->tanggal->format('d M Y') }}</td>
+                                <td class="py-3 text-slate-500 whitespace-nowrap">{{ format_app_date($t->tanggal) }}</td>
                                 <td class="py-3 font-medium text-slate-800 dark:text-slate-200">{{ $t->deskripsi ?: 'Tanpa deskripsi' }}</td>
                                 <td class="py-3 text-orange-500 whitespace-nowrap">{{ ucfirst($t->kategori) }}</td>
                                 <td class="py-3">
@@ -44,7 +44,7 @@
                                     </span>
                                 </td>
                                 <td class="py-3 text-right font-semibold whitespace-nowrap {{ $t->tipe === 'keluar' ? 'text-red-500' : 'text-emerald-600' }}">
-                                    {{ $t->tipe === 'keluar' ? '- ' : '+ ' }}Rp {{ number_format($t->nominal, 0, ',', '.') }}
+                                    {{ $t->tipe === 'keluar' ? '-' : '+' }}{{ format_currency($t->nominal) }}
                                 </td>
                             </tr>
                         @empty
@@ -66,7 +66,7 @@
                         <p class="text-sm font-semibold text-slate-800 dark:text-slate-200">{{ $p->nama_proyek }}</p>
                         <p class="text-xs text-slate-400 mt-1 mb-3">{{ $p->deskripsi ?: 'Tidak ada deskripsi.' }}</p>
                         <div class="flex items-center justify-between text-xs text-slate-500">
-                            <span>Pagu: Rp {{ number_format($p->pagu_anggaran, 0, ',', '.') }}</span>
+                            <span>Pagu: {{ format_currency($p->pagu_anggaran) }}</span>
                             <span class="text-orange-500 font-semibold">{{ ucfirst($p->kategori_proyek) }}</span>
                         </div>
                     </div>

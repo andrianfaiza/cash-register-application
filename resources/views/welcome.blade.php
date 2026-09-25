@@ -28,7 +28,7 @@
             </div>
 
             {{-- Middle Text --}}
-            <div class="max-w-md mt-24 lg:mt-0">
+            <div class="max-w-md mt-24 lg:mt-0">z
                 <h1 class="text-3xl lg:text-4xl font-bold leading-snug mb-4">
                     Kelola Kas Lebih Mudah,<br>
                     Pantau Keuangan Lebih Akurat.

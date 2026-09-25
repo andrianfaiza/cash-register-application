@@ -79,7 +79,7 @@
                                         <td class="px-3 py-4 hapus-col hidden">
                                             <input type="checkbox" name="transaksi_ids[]" value="{{ $transaction->id }}" class="transaksi-checkbox rounded border-slate-300">
                                         </td>
-                                        <td class="px-6 py-4 text-slate-500 dark:text-slate-400 whitespace-nowrap">{{ $transaction->tanggal->format('d M Y') }}</td>
+                                        <td class="px-6 py-4 text-slate-500 dark:text-slate-400 whitespace-nowrap">{{ format_app_date($transaction->tanggal) }}</td>
                                         <td class="px-6 py-4 font-medium text-slate-800 dark:text-slate-200">{{ $transaction->deskripsi ?: 'Tanpa deskripsi' }}</td>
                                         <td class="px-6 py-4 font-medium text-orange-500 whitespace-nowrap">{{ ucfirst($transaction->kategori) }}</td>
                                         <td class="px-6 py-4 text-slate-500 dark:text-slate-400 whitespace-nowrap">{{ $transaction->project?->nama_proyek ?: 'Non-Proyek' }}</td>
@@ -89,7 +89,7 @@
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 text-right font-semibold whitespace-nowrap {{ $transaction->tipe === 'keluar' ? 'text-red-500' : 'text-emerald-600' }}">
-                                            {{ $transaction->tipe === 'keluar' ? '- ' : '+ ' }}Rp {{ number_format($transaction->nominal, 0, ',', '.') }}
+                                            {{ $transaction->tipe === 'keluar' ? '-' : '+' }}{{ format_currency($transaction->nominal) }}
                                         </td>
                                         <td class="px-6 py-4">
                                             <div class="flex items-center gap-1 justify-end">

@@ -8,26 +8,26 @@
 {{-- SUMMARY CARDS --}}
 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
     <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
-        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">TOTAL PAGU ANGGARAN PROYEK</p>
-        <p class="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-3">Rp {{ number_format($totalBudget, 0, ',', '.') }}</p>
-        <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">Dianggarkan dalam {{ $projects->where('status', 'aktif')->count() }} proyek aktif</p>
+        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'TOTAL PROJECT BUDGET CEILING' : 'TOTAL PAGU ANGGARAN PROYEK' }}</p>
+        <p class="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-3">{{ format_currency($totalBudget) }}</p>
+        <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Budgeted across ' . $projects->where('status', 'aktif')->count() . ' active projects' : 'Dianggarkan dalam ' . $projects->where('status', 'aktif')->count() . ' proyek aktif' }}</p>
     </div>
     <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
-        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">REALISASI PENYERAPAN</p>
-        <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-3">Rp {{ number_format($totalSpent, 0, ',', '.') }}</p>
-        <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">{{ $persentaseRealisasi }} dari total pagu</p>
+        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'BUDGET REALIZATION' : 'REALISASI PENYERAPAN' }}</p>
+        <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-3">{{ format_currency($totalSpent) }}</p>
+        <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">{{ ($appSettings->bahasa ?? 'id') === 'en' ? $persentaseRealisasi . ' of total ceiling' : $persentaseRealisasi . ' dari total pagu' }}</p>
     </div>
     <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
-        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">SISA SALDO PROYEK</p>
-        <p class="text-2xl font-bold text-orange-500 mt-3">Rp {{ number_format($remainingBudget, 0, ',', '.') }}</p>
-        <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">Tersedia untuk dicairkan</p>
+        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'REMAINING PROJECT BALANCE' : 'SISA SALDO PROYEK' }}</p>
+        <p class="text-2xl font-bold text-orange-500 mt-3">{{ format_currency($remainingBudget) }}</p>
+        <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Available to disburse' : 'Tersedia untuk dicairkan' }}</p>
     </div>
 </div>
 
 {{-- DAFTAR PROYEK --}}
 <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
     <div class="flex items-center justify-between mb-5">
-        <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200">Daftar Proyek Aktif &amp; Penyerapan</h2>
+        <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Active Projects & Absorption' : 'Daftar Proyek Aktif & Penyerapan' }}</h2>
         <div class="flex items-center gap-2">
             <button
                 type="button"
@@ -39,13 +39,13 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
-                Hapus
+                {{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Delete' : 'Hapus' }}
             </button>
             <button onclick="openProyekModal()" class="flex items-center gap-2 bg-slate-950 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
-                Inisiasi Proyek
+                {{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Initiate Project' : 'Inisiasi Proyek' }}
             </button>
         </div>
     </div>
@@ -72,7 +72,7 @@
                 <p class="text-xs text-slate-400 dark:text-slate-500 mt-1 mb-4">{{ $project->deskripsi ?: 'Tidak ada deskripsi.' }}</p>
 
                 <div class="flex items-center justify-between text-[11px] text-slate-400 mb-1.5">
-                    <span>Penyerapan</span>
+                    <span>{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Absorption' : 'Penyerapan' }}</span>
                     <span class="font-semibold text-orange-500">{{ $project->progress }}%</span>
                 </div>
                 <div class="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-4">
@@ -81,17 +81,17 @@
 
                 <div class="flex items-center justify-between text-xs">
                     <div>
-                        <p class="text-slate-400 dark:text-slate-500">Terserap</p>
-                        <p class="font-semibold text-slate-800 dark:text-slate-200">Rp {{ number_format($project->spent, 0, ',', '.') }}</p>
+                        <p class="text-slate-400 dark:text-slate-500">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Absorbed' : 'Terserap' }}</p>
+                        <p class="font-semibold text-slate-800 dark:text-slate-200">{{ format_currency($project->spent) }}</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-slate-400 dark:text-slate-500">Total Pagu</p>
-                        <p class="font-semibold text-slate-800 dark:text-slate-200">Rp {{ number_format($project->pagu_anggaran, 0, ',', '.') }}</p>
+                        <p class="text-slate-400 dark:text-slate-500">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Total Ceiling' : 'Total Pagu' }}</p>
+                        <p class="font-semibold text-slate-800 dark:text-slate-200">{{ format_currency($project->pagu_anggaran) }}</p>
                     </div>
                 </div>
             </div>
         @empty
-            <p class="text-sm text-slate-400">Belum ada proyek.</p>
+            <p class="text-sm text-slate-400">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'No projects yet.' : 'Belum ada proyek.' }}</p>
         @endforelse
     </div>
 </div>

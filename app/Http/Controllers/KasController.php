@@ -71,12 +71,16 @@ class KasController extends Controller
             ->orderByDesc('saldo')
             ->get();
         $recentTransactions = Transaction::query()->latest('tanggal')->latest('id')->limit(5)->get();
-        $activeProjects = Project::query()->where('status', 'aktif')->latest()->limit(5)->get()->map(function (Project $project) {
+        $activeProjects = Project::query()->where('status', 'aktif')->latest()->get()->map(function (Project $project) {
             $spent = Transaction::query()->where('proyek_id', $project->id)->where('tipe', 'keluar')->where('status', 'Sukses')->sum('nominal');
             $project->spent = $spent;
             $project->progress = $project->pagu_anggaran > 0 ? min(100, round(($spent / $project->pagu_anggaran) * 100)) : 0;
             return $project;
         });
+
+        $totalProjectBudget = $activeProjects->sum('pagu_anggaran');
+        $totalProjectSpent = $activeProjects->sum('spent');
+        $avgProgress = $totalProjectBudget > 0 ? round(($totalProjectSpent / $totalProjectBudget) * 100) : 0;
 
         return view('dashboard', [
             'saldoKonsolidasi' => $pemasukan - $pengeluaran,
@@ -88,6 +92,9 @@ class KasController extends Controller
             'accounts' => $accounts,
             'recentTransactions' => $recentTransactions,
             'activeProjects' => $activeProjects,
+            'totalProjectBudget' => $totalProjectBudget,
+            'totalProjectSpent' => $totalProjectSpent,
+            'avgProgress' => $avgProgress,
         ]);
     }
 
