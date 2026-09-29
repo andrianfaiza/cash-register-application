@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <title>Laporan Kas Perusahaan - {{ $start->format('d M Y') }} s/d {{ $end->format('d M Y') }}</title>
     <style>
-        body { font-family: Arial, sans-serif; font-size: 12px; color: #1e293b; margin: 20px; }
-        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #0f172a; padding-bottom: 10px; }
+        body { font-family: Arial, sans-serif; font-size: 14px; color: #1e293b; margin: 20px; }
+        .header { text-align: center; margin-bottom: 10px; border-bottom: 2px solid #0f172a; padding-bottom: 10px; }
         .header h1 { margin: 0; font-size: 18px; color: #0f172a; }
         .header p { margin: 4px 0 0 0; font-size: 12px; color: #64748b; }
+        .header1 { text-align: center;  border-bottom: 2px solid #0f172a; padding-bottom: 10px; }
+        .header1 h3 { margin: 0; color: #0f172a; }
+        .header1 p { margin: 4px 0 0 0; font-size: 12px; color: #64748b; }
         .summary { display: flex; justify-content: space-between; margin-bottom: 20px; }
         .card { border: 1px solid #cbd5e1; padding: 12px; border-radius: 6px; width: 30%; }
         .card-title { font-size: 10px; text-transform: uppercase; color: #64748b; font-weight: bold; }
@@ -28,8 +31,34 @@
     </div>
 
     <div class="header">
-        <h1>LAPORAN KAS PERUSAHAAN</h1>
-        <p>PT. WINNER NUSANTARA JAYA</p>
+       <!-- TABEL HEADER / KOP SURAT (Tanpa Border) -->
+<table style="width: 100%; border-collapse: collapse; border: none;">
+    <tr>
+        <!-- Kolom Kiri: Logo Perusahaan -->
+        <td style="width: 20%; border: none; vertical-align: middle; text-align: left;">
+            <img src="{{ asset('logo-winner.png') }}" alt="Logo" style="max-height: 110px; width: auto;">
+        </td>
+
+        <!-- Kolom Tengah: Judul & Alamat Perusahaan (Berada di Tengah Halaman) -->
+        <td style="width: 60%; border: none; text-align: center; vertical-align: middle;">
+            <h2 style="margin: 0; font-size: 20px; font-weight: bold; color: #1e293b; text-transform: uppercase;">
+                WINNER NUSANTARA JAYA .Tbk
+            </h2>
+            <p style="margin: 4px 0 0 0; font-size: 11px; color: #64748b;">
+                Developer, Property Agent, Agent, Interior Design
+            </p>
+            <p style="margin: 2px 0 0 0; font-size: 10px; color: #64748b;">
+                Head Office Seraya Mas Blok H No.1 Telp. (0778) - 426066, Fax. (0778) - 458014
+            </p>
+        </td>
+
+        <!-- Kolom Kanan: Penyeimbang Grid Agar Judul Benar-benar Pas di Tengah -->
+        <td style="width: 20%; border: none;"></td>
+    </tr>
+</table>
+    </div>
+    <div class="header1">
+        <h3>LAPORAN KAS</h3>
         <p>Periode: {{ $start->translatedFormat('d F Y') }} - {{ $end->translatedFormat('d F Y') }}</p>
     </div>
 
