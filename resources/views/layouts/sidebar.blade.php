@@ -41,8 +41,12 @@
                     </a>
                     <a href="{{ route('laporan')}}" class="flex items-center gap-3 px-2.5 py-2.5 rounded-lg 
                     {{ request()->routeIs('laporan') ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }} text-sm font-medium transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        {{-- <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-6a2 2 0 012-2h2a2 2 0 012 2v6m-9 0h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg> --}}
+                       <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9A9.002 9.002 0 0015 3.512V9h5.488z" />
                         </svg>
                         <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Reports' : 'Laporan' }}</span>
                     </a>
