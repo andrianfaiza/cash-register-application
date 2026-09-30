@@ -20,11 +20,11 @@
         @endif
     </button>
 
-    {{-- Dropdown Pop-up Notifikasi --}}
+    {{-- Full Screen Notification (Mobile) / Dropdown (Desktop) --}}
     <div id="notificationDropdown"
-        class="hidden absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 z-50 overflow-hidden transition-all duration-200 transform origin-top-right">
+        class="hidden fixed inset-0 z-50 lg:absolute lg:inset-auto lg:right-0 lg:mt-2 lg:w-80 xl:w-96 bg-white dark:bg-slate-900 lg:rounded-xl shadow-2xl lg:border border-slate-200 dark:border-slate-800 overflow-hidden transition-all duration-200">
         
-        <!-- Header Dropdown -->
+        <!-- Header -->
         <div class="flex items-center justify-between px-4 py-3 bg-slate-50/80 dark:bg-slate-950/80 border-b border-slate-100 dark:border-slate-800">
             <div class="flex items-center gap-2">
                 <h3 class="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
@@ -34,13 +34,20 @@
                     {{ ($unreadNotificationCount ?? 0) }} {{ ($appSettings->bahasa ?? 'id') === 'en' ? 'New' : 'Baru' }}
                 </span>
             </div>
-            <button type="button" onclick="tandaiSemuaDibaca()" class="text-[11px] font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition focus:outline-none">
-                {{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Mark all as read' : 'Tandai dibaca' }}
-            </button>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="tandaiSemuaDibaca()" class="text-[11px] font-medium text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition focus:outline-none">
+                    {{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Mark all as read' : 'Tandai dibaca' }}
+                </button>
+                <button type="button" onclick="toggleNotificationMenu()" class="lg:hidden p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <!-- Daftar Notifikasi -->
-        <div id="notificationList" class="divide-y divide-slate-100 dark:divide-slate-800 max-h-80 overflow-y-auto">
+        <div id="notificationList" class="divide-y divide-slate-100 dark:divide-slate-800 max-h-[70vh] lg:max-h-80 overflow-y-auto">
             @forelse ($appNotifications ?? [] as $notif)
                 <a href="{{ $notif['url'] ?? '#' }}"
                     data-notif-id="{{ $notif['id'] ?? '' }}"
@@ -91,7 +98,7 @@
             @endforelse
         </div>
 
-        <!-- Footer Dropdown -->
+        <!-- Footer -->
         <a href="{{ route('transaksi') }}" class="block text-center py-2.5 text-xs font-semibold text-blue-600 dark:text-blue-400 bg-slate-50/80 dark:bg-slate-950/80 hover:bg-slate-100 dark:hover:bg-slate-800/80 border-t border-slate-100 dark:border-slate-800 transition">
             {{ ($appSettings->bahasa ?? 'id') === 'en' ? 'View All Transactions' : 'Lihat Semua Transaksi' }} &rarr;
         </a>

@@ -5,23 +5,65 @@
 @section('description', 'Memantau dana khusus proyek, penyerapan anggaran secara berkala, dan sisa alokasi.')
 @section('content')
 
+<div class="block lg:hidden mb-6">
+<!-- Card Utama Warna Gelap/Biru -->
+<div class="bg-slate-900 text-white rounded-2xl p-5 shadow-lg">
+    <!-- Saldo Utama (Di Atas) -->
+    <div class="mb-5">
+        <p class="text-xs uppercase tracking-wider text-slate-400 font-semibold">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'TOTAL PROJECT BUDGET CEILING' : 'TOTAL PAGU ANGGARAN PROYEK' }}</p>
+        <h2 class="text-2xl font-bold mt-1">{{ format_currency($totalBudget) }}</h2>
+        <p class="text-[11px] text-slate-400 mt-1">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Budgeted across ' . $projects->where('status', 'aktif')->count() . ' active projects' : 'Dianggarkan dalam ' . $projects->where('status', 'aktif')->count() . ' proyek aktif' }}</p>
+    </div>
+
+    <!-- 2 Box di Dalam (Pemasukan & Pengeluaran) -->
+    <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-800">
+        <!-- Box Pemasukan -->
+        <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50">
+            <p class="text-[10px] uppercase font-semibold text-slate-400 block">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'BUDGET REALIZATION' : 'REALISASI PENYERAPAN' }}</p>
+            <h2 class="text-sm font-bold text-emerald-400 mt-0.5 block">{{ format_currency($totalSpent) }}</h2>
+            <p class="text-[9px] text-slate-400 block mt-0.5">{{ ($appSettings->bahasa ?? 'id') === 'en' ? $persentaseRealisasi . ' of total ceiling' : $persentaseRealisasi . ' dari total pagu' }}</p>
+        </div>
+
+        <!-- Box Pengeluaran -->
+        <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50">
+            <p class="text-[10px] uppercase font-semibold text-slate-400 block">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'REMAINING PROJECT BALANCE' : 'SISA SALDO PROYEK' }}</p>
+            <p class="text-sm font-bold text-rose-400 mt-0.5 block">{{ format_currency($remainingBudget) }}</p>
+            <p class="text-[9px] text-slate-400 block mt-0.5">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Available to disburse' : 'Tersedia untuk dicairkan' }}</p>
+        </div>
+    </div>
+</div>
+</div>
+
 {{-- SUMMARY CARDS --}}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-    <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
-        <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'TOTAL PROJECT BUDGET CEILING' : 'TOTAL PAGU ANGGARAN PROYEK' }}</p>
+<div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-5">
+    <div class="bg-slate-900 text-white rounded-2xl p-6 shadow-sm border border-slate-800 flex flex-col justify-between">
+         <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'TOTAL PROJECT BUDGET CEILING' : 'TOTAL PAGU ANGGARAN PROYEK' }}</p>
         <p class="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-3">{{ format_currency($totalBudget) }}</p>
         <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Budgeted across ' . $projects->where('status', 'aktif')->count() . ' active projects' : 'Dianggarkan dalam ' . $projects->where('status', 'aktif')->count() . ' proyek aktif' }}</p>
     </div>
-    <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
+
+    <!-- Card 2: Total Pemasukan -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
         <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'BUDGET REALIZATION' : 'REALISASI PENYERAPAN' }}</p>
         <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-3">{{ format_currency($totalSpent) }}</p>
         <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">{{ ($appSettings->bahasa ?? 'id') === 'en' ? $persentaseRealisasi . ' of total ceiling' : $persentaseRealisasi . ' dari total pagu' }}</p>
     </div>
-    <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
+
+    <!-- Card 3: Total Pengeluaran -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
         <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'REMAINING PROJECT BALANCE' : 'SISA SALDO PROYEK' }}</p>
         <p class="text-2xl font-bold text-orange-500 mt-3">{{ format_currency($remainingBudget) }}</p>
         <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Available to disburse' : 'Tersedia untuk dicairkan' }}</p>
     </div>
+    {{-- <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
+       
+    </div>
+    <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
+        
+    </div>
+    <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
+        
+    </div> --}}
 </div>
 
 {{-- DAFTAR PROYEK --}}
@@ -56,20 +98,20 @@
                 <div class="hapus-col hidden absolute top-3 left-3">
                     <input type="checkbox" name="proyek_ids[]" value="{{ $project->id }}" class="proyek-checkbox rounded border-slate-300">
                 </div>
-                <div class="flex justify-between items-center">
-                    <p class="text-sm font-semibold text-slate-800 dark:text-slate-100">{{ $project->nama_proyek }}</p>
+                <div class="flex justify-between items-center gap-2">
+                    <p class="text-sm font-semibold text-slate-800 dark:text-slate-100 truncate">{{ $project->nama_proyek }}</p>
                     <button
                         type="button"
                         title="Edit Proyek"
                         onclick="editProyek({{ $project->id }})"
-                        class="w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-colors"
+                        class="w-7 h-7 flex items-center justify-center rounded-md text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-colors shrink-0"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                     </button>
                 </div>
-                <p class="text-xs text-slate-400 dark:text-slate-500 mt-1 mb-4">{{ $project->deskripsi ?: 'Tidak ada deskripsi.' }}</p>
+                <p class="text-xs text-slate-400 dark:text-slate-500 mt-1 mb-4 truncate">{{ $project->deskripsi ?: 'Tidak ada deskripsi.' }}</p>
 
                 <div class="flex items-center justify-between text-[11px] text-slate-400 mb-1.5">
                     <span>{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Absorption' : 'Penyerapan' }}</span>

@@ -196,7 +196,7 @@
                 {{-- Riwayat Log --}}
                 <div>
                     <p class="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Riwayat Log Terakhir</p>
-                    <div class="overflow-x-auto rounded-lg border border-slate-100 dark:border-slate-800">
+                    <div class="hidden md:block overflow-x-auto rounded-lg border border-slate-100 dark:border-slate-800">
                         <table class="w-full text-sm">
                             <thead>
                                 <tr class="text-left text-xs text-slate-400 uppercase tracking-wide bg-slate-50 dark:bg-slate-950">
@@ -223,6 +223,23 @@
                                 @endforeach
                             </tbody>
                         </table>
+                    </div>
+
+                    <div class="md:hidden space-y-3">
+                        @foreach ($riwayatLogin as $log)
+                            <div class="bg-slate-50 dark:bg-slate-800/40 rounded-lg p-3 border border-slate-100 dark:border-slate-800">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs text-slate-500 dark:text-slate-400">{{ $log['waktu'] }}</span>
+                                    @if ($log['status'] === 'Berhasil')
+                                        <span class="inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400">Berhasil</span>
+                                    @else
+                                        <span class="inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-950/80 text-red-600 dark:text-red-400">Gagal</span>
+                                    @endif
+                                </div>
+                                <p class="text-sm font-medium text-slate-700 dark:text-slate-200 mb-1">{{ $log['perangkat'] }}</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">IP: {{ $log['ip'] }}</p>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
             </div>

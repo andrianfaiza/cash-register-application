@@ -9,9 +9,42 @@
 <div class="flex">
     <h1 id="greetingText" data-user-name="{{ auth()->user()->name ?? 'Guest' }}" class="text-lg font-bold"></h1>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-    {{-- Saldo Konsolidasi --}}
-    <div class="bg-slate-950 text-white rounded-xl p-5 border border-slate-800">
+<!-- ======================================================== -->
+<!-- 1. TAMPILAN KHUSUS MOBILE (Muncul di Layar HP saja)       -->
+<!-- ======================================================== -->
+<div class="block lg:hidden mb-6">
+<!-- Card Utama Warna Gelap/Biru -->
+<div class="bg-slate-900 text-white rounded-2xl p-5 shadow-lg">
+    <!-- Saldo Utama (Di Atas) -->
+    <div class="mb-5">
+        <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Total Saldo Konsolidasi</span>
+        <h2 class="text-2xl font-bold mt-1">Rp 233.150.000</h2>
+        <p class="text-[11px] text-slate-400 mt-1">
+            Saldo bersih dari transaksi sukses • <span class="text-emerald-400 font-medium">Likuiditas Sehat</span>
+        </p>
+    </div>
+
+    <!-- 2 Box di Dalam (Pemasukan & Pengeluaran) -->
+    <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-800">
+        <!-- Box Pemasukan -->
+        <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50">
+            <span class="text-[10px] uppercase font-semibold text-slate-400 block">Total Pemasukan</span>
+            <span class="text-sm font-bold text-emerald-400 mt-0.5 block">Rp 404.750.000</span>
+            <span class="text-[9px] text-slate-400 block mt-0.5">8 transaksi</span>
+        </div>
+
+        <!-- Box Pengeluaran -->
+        <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50">
+            <span class="text-[10px] uppercase font-semibold text-slate-400 block">Total Pengeluaran</span>
+            <span class="text-sm font-bold text-rose-400 mt-0.5 block">Rp 171.600.000</span>
+            <span class="text-[9px] text-slate-400 block mt-0.5">11 pos</span>
+        </div>
+    </div>
+</div>
+</div>
+<div class="hidden lg:grid grid-cols-1 md:grid-cols-3 gap-5">
+    <!-- Card 1: Saldo Utama -->
+    <div class="bg-slate-900 text-white rounded-2xl p-6 shadow-sm border border-slate-800 flex flex-col justify-between">
         <p class="text-xs font-semibold text-orange-500 tracking-wide">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'TOTAL CONSOLIDATED BALANCE' : 'TOTAL SALDO KONSOLIDASI' }}</p>
         <p class="text-2xl font-bold mt-3">{{ format_currency($saldoKonsolidasi) }}</p>
         <p class="text-xs text-slate-400 mt-3">
@@ -20,18 +53,19 @@
         </p>
     </div>
 
-    {{-- Pemasukan --}}
-    <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
+    <!-- Card 2: Total Pemasukan -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
         <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'TOTAL INCOME' : 'TOTAL PEMASUKAN' }}</p>
         <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-3">{{ format_currency($pemasukan) }}</p>
         <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'From ' . $jumlahTransaksiMasuk . ' successful transactions' : 'Dari ' . $jumlahTransaksiMasuk . ' transaksi sukses' }}</p>
     </div>
 
-    {{-- Pengeluaran --}}
-    <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
+    <!-- Card 3: Total Pengeluaran -->
+    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
         <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'TOTAL EXPENSE' : 'TOTAL PENGELUARAN' }}</p>
         <p class="text-2xl font-bold text-red-500 dark:text-red-400 mt-3">{{ format_currency($pengeluaran) }}</p>
         <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'From ' . $jumlahPosKeluar . ' operational & project posts' : 'Dari ' . $jumlahPosKeluar . ' pos operasional & proyek' }}</p>
+        
     </div>
 </div>
 
@@ -131,7 +165,7 @@
         <a class="text-xs underline text-blue-600 dark:text-blue-400 font-medium" href="{{ route('transaksi')}}">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'View All Transactions' : 'Lihat Semua Transaksi' }} &rarr;</a>
     </div>
 
-    <div class="overflow-x-auto">
+    <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
                 <tr class="text-left text-xs text-slate-400 uppercase tracking-wide border-b border-slate-100 dark:border-slate-800">
@@ -166,6 +200,32 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    <div class="md:hidden space-y-3">
+        @forelse ($recentTransactions as $transaction)
+            <div class="bg-slate-50 dark:bg-slate-800/40 rounded-lg p-3 border border-slate-100 dark:border-slate-800">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs text-slate-500 dark:text-slate-400">{{ format_app_date($transaction->tanggal) }}</span>
+                    <span class="inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full {{ $transaction->status === 'Sukses' ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400' : 'bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-400' }}">
+                        {{ $transaction->status }}
+                    </span>
+                </div>
+                <p class="font-medium text-slate-800 dark:text-slate-200 text-sm mb-1 truncate">{{ $transaction->deskripsi ?: 'Tanpa deskripsi' }}</p>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2 text-xs min-w-0">
+                        <span class="text-orange-500 font-medium truncate">{{ ucfirst($transaction->kategori) }}</span>
+                        <span class="text-slate-400">&bull;</span>
+                        <span class="text-slate-500 dark:text-slate-400 truncate">{{ $transaction->project?->nama_proyek ?: 'Non-Proyek' }}</span>
+                    </div>
+                    <span class="font-semibold text-sm shrink-0 ml-2 {{ $transaction->tipe === 'masuk' ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400' }}">
+                        {{ $transaction->tipe === 'masuk' ? '+' : '-' }}{{ format_currency($transaction->nominal) }}
+                    </span>
+                </div>
+            </div>
+        @empty
+            <p class="text-sm text-slate-400 text-center py-6">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'No transactions yet.' : 'Belum ada transaksi.' }}</p>
+        @endforelse
     </div>
 </div>
 

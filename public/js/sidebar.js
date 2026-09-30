@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     const sidebar = document.getElementById('sidebar');
+    if (!sidebar) return;
     let hoverTimer = null;
 
     // Saat kursor masuk ke area sidebar

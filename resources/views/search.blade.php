@@ -21,7 +21,7 @@
         {{-- TRANSAKSI MATCHES --}}
         <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6">
             <h3 class="text-md font-bold text-slate-800 dark:text-slate-200 mb-4">Transaksi Kas</h3>
-            <div class="overflow-x-auto">
+            <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
                         <tr class="text-left text-xs text-slate-400 uppercase border-b border-slate-100 dark:border-slate-700">
@@ -54,6 +54,28 @@
                         @endforelse
                     </tbody>
                 </table>
+            </div>
+
+            <div class="md:hidden space-y-3">
+                @forelse ($transactions as $t)
+                    <div class="bg-slate-50 dark:bg-slate-800/40 rounded-lg p-3 border border-slate-100 dark:border-slate-800">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs text-slate-500 dark:text-slate-400">{{ format_app_date($t->tanggal) }}</span>
+                            <span class="inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full {{ $t->status === 'Sukses' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }}">
+                                {{ $t->status }}
+                            </span>
+                        </div>
+                        <p class="font-medium text-slate-800 dark:text-slate-200 text-sm mb-1">{{ $t->deskripsi ?: 'Tanpa deskripsi' }}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-orange-500 font-medium text-xs">{{ ucfirst($t->kategori) }}</span>
+                            <span class="font-semibold text-sm {{ $t->tipe === 'keluar' ? 'text-red-500' : 'text-emerald-600' }}">
+                                {{ $t->tipe === 'keluar' ? '-' : '+' }}{{ format_currency($t->nominal) }}
+                            </span>
+                        </div>
+                    </div>
+                @empty
+                    <p class="text-sm text-slate-400 text-center py-6">Tidak ada transaksi yang cocok.</p>
+                @endforelse
             </div>
         </div>
 

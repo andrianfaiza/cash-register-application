@@ -83,7 +83,7 @@
         <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Monthly Cash Book Summary' : 'Ringkasan Buku Kas Bulanan' }}</h2>
     </div>
 
-    <div class="overflow-x-auto">
+    <div class="hidden md:block overflow-x-auto">
         <table class="w-full text-sm">
             <thead>
                 <tr class="text-left text-xs text-slate-400 uppercase tracking-wide bg-slate-50/50 dark:bg-slate-950/50">
@@ -108,6 +108,34 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    <div class="md:hidden space-y-3">
+        @forelse ($recap as $r)
+            <div class="bg-slate-50 dark:bg-slate-800/40 rounded-lg p-4 border border-slate-100 dark:border-slate-800">
+                <p class="font-semibold text-slate-800 dark:text-slate-200 text-sm mb-3">{{ $r['account'] }}</p>
+                <div class="space-y-2 text-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 dark:text-slate-400">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Initial Balance' : 'Saldo Awal' }}</span>
+                        <span class="text-slate-600 dark:text-slate-300">{{ format_currency($r['initial']) }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 dark:text-slate-400">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Income' : 'Pemasukan' }}</span>
+                        <span class="text-emerald-600 dark:text-emerald-400 font-medium">{{ format_currency($r['income']) }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-slate-500 dark:text-slate-400">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Expense' : 'Pengeluaran' }}</span>
+                        <span class="text-red-500 dark:text-red-400 font-medium">{{ format_currency($r['expense']) }}</span>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
+                        <span class="text-slate-700 dark:text-slate-200 font-medium">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Final Balance' : 'Saldo Akhir' }}</span>
+                        <span class="font-bold text-slate-900 dark:text-slate-100">{{ format_currency($r['final']) }}</span>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <p class="text-sm text-slate-400 text-center py-6">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'No report data available.' : 'Belum ada data laporan.' }}</p>
+        @endforelse
     </div>
 </div>
 
