@@ -34,7 +34,7 @@
         @method('PUT')
 
         {{-- Bahasa & Format --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+        <div class="app-card bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
             <div class="flex items-center justify-between mb-5">
                 <h2 class="text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider uppercase">
                     {{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Language & Formatting' : 'Bahasa & Format' }}
@@ -116,7 +116,7 @@
         </div>
 
         {{-- Mode Tampilan --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+        <div class="app-card bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
             <h2 class="text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider uppercase mb-5">
                 {{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Theme Mode' : 'Mode Tampilan' }}
             </h2>
@@ -153,7 +153,7 @@
             $isEmailNotif = (bool) old('notif_email', $settings->notif_email ?? true);
             $isSistemNotif = (bool) old('notif_sistem', $settings->notif_sistem ?? true);
         @endphp
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
+        <div class="app-card bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm">
             <h2 class="text-xs font-bold text-slate-800 dark:text-slate-200 tracking-wider uppercase mb-5">
                 {{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Notification Preferences' : 'Pengaturan Notifikasi' }}
             </h2>
