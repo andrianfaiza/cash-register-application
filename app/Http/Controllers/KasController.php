@@ -121,8 +121,8 @@ class KasController extends Controller
                 'deskripsi' => $t->deskripsi,
                 'rekening_id' => $t->rekening_id,
                 'status' => $t->status,
-                'verifikasi_langsung' => $t->verifikasi_langsung,
-                'bukti' => $t->bukti ? asset('storage/' . $t->bukti) : null,
+                'bukti' => $t->bukti ? route('transaksi.bukti', $t) : null,
+                'bukti_gambar' => $t->bukti && in_array(strtolower(pathinfo($t->bukti, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif', 'webp'], true),
             ])->values(),
             'accountOptions' => Transaction::query()->whereNotNull('rekening_id')->distinct()->orderBy('rekening_id')->pluck('rekening_id'),
             'categoryOptions' => Transaction::query()->whereNotNull('kategori')->distinct()->orderBy('kategori')->pluck('kategori'),
@@ -147,7 +147,6 @@ class KasController extends Controller
             'proyek_id' => ['nullable', 'integer', 'exists:projects,id'],
             'deskripsi' => ['nullable', 'string', 'max:1000'],
             'rekening_id' => ['nullable', 'string', 'max:100'],
-            'verifikasi_langsung' => ['required', 'boolean'],
             'bukti' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ]);
 
@@ -155,7 +154,7 @@ class KasController extends Controller
             $data['bukti'] = $request->file('bukti')->store('bukti-transaksi', 'public');
         }
 
-        $data['status'] = $request->boolean('verifikasi_langsung') ? 'Sukses' : 'Pending';
+        $data['status'] = 'Sukses';
         Transaction::create($data);
 
         return redirect()->route('transaksi')->with('success', 'Transaksi berhasil disimpan.');
@@ -171,7 +170,6 @@ class KasController extends Controller
             'proyek_id' => ['nullable', 'integer', 'exists:projects,id'],
             'deskripsi' => ['nullable', 'string', 'max:1000'],
             'rekening_id' => ['nullable', 'string', 'max:100'],
-            'verifikasi_langsung' => ['required', 'boolean'],
             'bukti' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
         ]);
 
@@ -182,10 +180,18 @@ class KasController extends Controller
             $data['bukti'] = $request->file('bukti')->store('bukti-transaksi', 'public');
         }
 
-        $data['status'] = $request->boolean('verifikasi_langsung') ? 'Sukses' : 'Pending';
         $transaction->update($data);
 
         return redirect()->route('transaksi')->with('success', 'Transaksi berhasil diperbarui.');
+    }
+
+    public function transactionProof(Transaction $transaction)
+    {
+        abort_unless($transaction->bukti && Storage::disk('public')->exists($transaction->bukti), 404);
+
+        return response()->file(Storage::disk('public')->path($transaction->bukti), [
+            'Content-Disposition' => 'inline; filename="' . basename($transaction->bukti) . '"',
+        ]);
     }
 
     public function destroyTransactions(Request $request): RedirectResponse
@@ -347,6 +353,16 @@ class KasController extends Controller
     public function updateProfile(Request $request): RedirectResponse
     {
         $user = $request->user();
+
+        if ($request->boolean('reset_foto')) {
+            if ($user->foto && str_starts_with($user->foto, 'foto-profil/') && Storage::disk('public')->exists($user->foto)) {
+                Storage::disk('public')->delete($user->foto);
+            }
+
+            $user->update(['foto' => 'no-profile.jpg']);
+
+            return redirect()->route('profile')->with('success', 'Foto profil dikembalikan ke foto default.');
+        }
 
         if ($request->hasFile('foto_profil')) {
             $request->validate([
