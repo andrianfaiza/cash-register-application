@@ -25,7 +25,6 @@
         <form id="transaksiForm" method="POST" action="{{ route('transaksi.store') }}" enctype="multipart/form-data" onsubmit="return handleTransaksiSubmit(event)">
             @csrf
             <input type="hidden" name="tipe" id="inputTipe" value="keluar">
-            <input type="hidden" name="verifikasi_langsung" id="inputVerifikasi" value="1">
 
             <div class="max-h-[75vh] overflow-y-auto px-6 py-6 space-y-5">
 
@@ -162,14 +161,6 @@
                 <button type="button" onclick="closeModal()" class="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
                     Batal
                 </button>
-
-                <label class="flex items-center gap-2 cursor-pointer select-none">
-                    <span class="text-sm font-medium text-slate-600 dark:text-slate-300">Verifikasi Langsung</span>
-                    <button type="button" id="toggleVerifikasi" onclick="toggleVerifikasi()"
-                        class="relative w-9 h-5 rounded-full transition-colors bg-emerald-500">
-                        <span id="toggleKnob" class="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform translate-x-4"></span>
-                    </button>
-                </label>
 
                 <button type="submit" class="flex items-center gap-2 bg-slate-950 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg">
                     Simpan Transaksi
