@@ -6,7 +6,7 @@
 @section('content')
 
 {{-- PERIODE & EXPORT BAR --}}
-<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between flex-wrap gap-3">
+<div class="app-card bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between flex-wrap gap-3">
     <div class="flex items-center gap-3">
         <span class="text-sm font-medium text-slate-600 dark:text-slate-300">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Report Period:' : 'Periode Laporan:' }}</span>
         <button class="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg px-4 py-2">
@@ -36,7 +36,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
     {{-- Fluktuasi Arus Kas Bersih --}}
-    <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between">
+    <div class="app-card lg:col-span-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 flex flex-col justify-between">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Net Cashflow Fluctuation' : 'Fluktuasi Arus Kas Bersih (Net Cashflow)' }}</h2>
             <div class="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
@@ -56,7 +56,7 @@
     </div>
 
     {{-- Komposisi Pengeluaran --}}
-    <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
+    <div class="app-card bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
         <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-5">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Expense Breakdown' : 'Komposisi Pengeluaran' }}</h2>
         <div class="space-y-4">
             @forelse ($composition as $k)
@@ -78,7 +78,7 @@
 </div>
 
 {{-- RINGKASAN BUKU KAS BULANAN --}}
-<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+<div class="app-card bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
     <div class="px-6 py-4 border-b border-slate-100 dark:border-slate-800">
         <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Monthly Cash Book Summary' : 'Ringkasan Buku Kas Bulanan' }}</h2>
     </div>
@@ -96,7 +96,7 @@
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                 @forelse ($recap as $r)
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                    <tr class="table-row-enter hover:bg-slate-50 dark:hover:bg-slate-800/50" style="--motion-delay: {{ min($loop->index * 30, 360) }}ms">
                         <td class="px-6 py-4 font-semibold text-slate-800 dark:text-slate-200 whitespace-nowrap">{{ $r['account'] }}</td>
                         <td class="px-6 py-4 text-right text-slate-500 dark:text-slate-400 whitespace-nowrap">{{ format_currency($r['initial']) }}</td>
                         <td class="px-6 py-4 text-right text-emerald-600 dark:text-emerald-400 font-medium whitespace-nowrap">{{ format_currency($r['income']) }}</td>
@@ -112,7 +112,7 @@
 
     <div class="md:hidden space-y-3">
         @forelse ($recap as $r)
-            <div class="bg-slate-50 dark:bg-slate-800/40 rounded-lg p-4 border border-slate-100 dark:border-slate-800">
+            <div class="app-card table-row-enter bg-slate-50 dark:bg-slate-800/40 rounded-lg p-4 border border-slate-100 dark:border-slate-800" style="--motion-delay: {{ min($loop->index * 30, 360) }}ms">
                 <p class="font-semibold text-slate-800 dark:text-slate-200 text-sm mb-3">{{ $r['account'] }}</p>
                 <div class="space-y-2 text-sm">
                     <div class="flex items-center justify-between">
@@ -153,7 +153,7 @@
         const labels = fluxData.map(f => f.label);
         const values = fluxData.map(f => f.value);
 
-        new Chart(ctx, {
+        const cashflowChart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: labels,
@@ -174,7 +174,9 @@
                     pointHoverRadius: 6,
                 }]
             },
+            plugins: [window.cashflowLineRevealPlugin],
             options: {
+                animation: false,
                 responsive: true,
                 maintainAspectRatio: false,
                 interaction: {
@@ -241,6 +243,7 @@
                 }
             }
         });
+        window.animateCashflowLine(cashflowChart);
     });
 </script>
 @endif

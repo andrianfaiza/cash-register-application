@@ -20,20 +20,7 @@ function resetTransaksiForm() {
     form.reset();
 
     setTipe('keluar');
-    setVerifikasiState(true);
     document.getElementById('fileNameLabel').textContent = 'Klik untuk upload';
-}
-
-function setVerifikasiState(isOn) {
-    const input = document.getElementById('inputVerifikasi');
-    const btn = document.getElementById('toggleVerifikasi');
-    const knob = document.getElementById('toggleKnob');
-
-    input.value = isOn ? '1' : '0';
-    btn.classList.toggle('bg-emerald-500', isOn);
-    btn.classList.toggle('bg-slate-300', !isOn);
-    knob.classList.toggle('translate-x-4', isOn);
-    knob.classList.toggle('translate-x-0.5', !isOn);
 }
 
 function openModal() {
@@ -91,7 +78,6 @@ function editTransaksi(id) {
     form.querySelector('[name="proyek_id"]').value = data.proyek_id ?? '';
     form.querySelector('[name="deskripsi"]').value = data.deskripsi ?? '';
     form.querySelector('[name="rekening_id"]').value = data.rekening_id ?? 'kas-besar';
-    setVerifikasiState(!!data.verifikasi_langsung);
     document.getElementById('fileNameLabel').textContent = 'Klik untuk upload';
 
     const modal = document.getElementById('formModal');
@@ -200,11 +186,6 @@ function setTipe(tipe) {
     }
 }
 
-function toggleVerifikasi() {
-    const input = document.getElementById('inputVerifikasi');
-    setVerifikasiState(input.value !== '1');
-}
-
 function updateFileName(input) {
     const label = document.getElementById('fileNameLabel');
     label.textContent = input.files[0]?.name ?? 'Klik untuk upload';
@@ -250,8 +231,7 @@ function openDetailModal(id) {
         buktiContent.classList.add('flex');
         buktiLink.href = data.bukti;
 
-        const isImage = data.bukti.match(/\.(jpeg|jpg|gif|png|webp)$/i);
-        if (isImage) {
+        if (data.bukti_gambar) {
             buktiImg.src = data.bukti;
             buktiImg.classList.remove('hidden');
         } else {
