@@ -6,12 +6,19 @@
 
 @section('content')
 
+    @if (session('success'))
+        <div class="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+            {{ session('success') }}
+        </div>
+    @endif
+
     @php
         $user = $user ?? $account;
         $user->nama = $user->nama ?? $user->name ?? 'Pengguna';
         $user->jabatan = $user->jabatan ?? 'Finance Admin';
         $user->status = $user->status ?? 'Aktif';
         $user->foto = $user->foto ?? 'no-profile.jpg';
+        $fotoProfilUrl = str_starts_with($user->foto, 'foto-profil') ? asset('storage/' . $user->foto) : asset($user->foto);
         $user->telepon = $user->telepon ?? '-';
         $user->nip = $user->nip ?? '-';
         $user->departemen = $user->departemen ?? 'Finance & Accounting';
@@ -32,21 +39,45 @@
         {{-- =========================== --}}
         {{-- KOLOM KIRI: PROFILE CARD     --}}
         {{-- =========================== --}}
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col items-center text-center">
+        <div class="app-card bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col items-center text-center">
             <div class="relative">
-                <img src="{{ $user->foto ? (str_starts_with($user->foto, 'foto-profil') ? asset('storage/' . $user->foto) : asset($user->foto)) : asset('no-profile.jpg') }}" alt="{{ $user->nama }}" class="w-24 h-24 rounded-full object-cover">
-                <form id="avatarForm" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
+                <button type="button" id="profilePhotoMenuButton" aria-expanded="false" aria-controls="profilePhotoMenu" onclick="toggleProfilePhotoMenu(event)" class="h-28 w-28 overflow-hidden rounded-lg border border-slate-200 bg-slate-100 transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800">
+                    <img id="profileAvatar" src="{{ $fotoProfilUrl }}" alt="Foto profil {{ $user->nama }}" class="h-full w-full object-cover">
+                </button>
+                <form id="avatarForm" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="hidden">
                     @csrf
                     @method('PUT')
                     <input type="hidden" name="email" value="{{ $user->email }}">
-                    <label class="absolute bottom-0 right-0 w-8 h-8 flex items-center justify-center bg-slate-950 dark:bg-blue-600 text-white rounded-full cursor-pointer hover:bg-slate-800 dark:hover:bg-blue-700 border-2 border-white dark:border-slate-900">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 13a3 3 0 100 6 3 3 0 000-6z" />
-                        </svg>
-                        <input type="file" name="foto_profil" accept="image/*" class="hidden" onchange="document.getElementById('avatarForm').submit()">
-                    </label>
+                    <input type="file" id="profilePhotoInput" name="foto_profil" accept="image/*" onchange="submitProfilePhoto(this)">
                 </form>
+
+                <div id="profilePhotoMenu" class="absolute left-1/2 top-full z-30 mt-2 hidden w-52 -translate-x-1/2 overflow-hidden rounded-lg border border-slate-200 bg-white py-1 text-left shadow-xl dark:border-slate-700 dark:bg-slate-900">
+                    <button type="button" onclick="openProfilePhotoPicker('camera')" class="flex w-full items-center gap-3 px-3 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800">
+                        <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8a2 2 0 012-2h2l1.5-2h7L17 6h2a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/><circle cx="12" cy="13" r="3"/></svg>
+                        Ambil foto
+                    </button>
+                    <button type="button" onclick="openProfilePhotoPicker('file')" class="flex w-full items-center gap-3 px-3 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800">
+                        <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16"/><path stroke-linecap="round" stroke-linejoin="round" d="M8 4v6m8 4v6"/></svg>
+                        Ganti foto
+                    </button>
+                    <button type="button" onclick="openProfilePhotoPreview()" class="flex w-full items-center gap-3 px-3 py-2.5 text-sm text-slate-700 transition hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800">
+                        <svg class="h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7C20.268 16.057 16.477 19 12 19s-8.268-2.943-9.542-7z"/><circle cx="12" cy="12" r="3"/></svg>
+                        Lihat foto
+                    </button>
+                    @if ($user->foto !== 'no-profile.jpg')
+                        <div class="my-1 border-t border-slate-100 dark:border-slate-800"></div>
+                        <form method="POST" action="{{ route('profile.update') }}" onsubmit="return confirm('Kembalikan foto profil ke foto default?')">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="reset_foto" value="1">
+                            <button type="submit" class="flex w-full items-center gap-3 px-3 py-2.5 text-sm text-red-600 transition hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/40">
+                                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                Hapus foto
+                            </button>
+                        </form>
+                    @endif
+                </div>
+
             </div>
 
             <h2 class="text-base font-bold text-slate-900 dark:text-slate-100 mt-4">{{ $user->nama }}</h2>
@@ -85,7 +116,7 @@
         <div class="lg:col-span-2 space-y-5">
 
             {{-- 2. INFORMASI PRIBADI --}}
-            <form id="profilForm" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+            <form id="profilForm" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="app-card bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
                 @csrf
                 @method('PUT')
                 <h2 class="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-wide mb-5">INFORMASI PRIBADI</h2>
@@ -129,7 +160,7 @@
             </form>
 
             {{-- 3. KEAMANAN AKUN --}}
-            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+            <div class="app-card bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
                 <h2 class="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-wide mb-5">KEAMANAN AKUN</h2>
 
                 {{-- Ubah Password --}}
@@ -162,7 +193,7 @@
                 </form>
 
             {{-- 4. AKTIVITAS & RIWAYAT LOGIN --}}
-            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
+            <div class="app-card bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6">
                 <h2 class="text-sm font-bold text-slate-800 dark:text-slate-200 tracking-wide mb-5">AKTIVITAS &amp; RIWAYAT LOGIN</h2>
 
                 {{-- Sesi Aktif --}}
@@ -244,6 +275,15 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div id="profilePhotoPreview" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 p-4" style="z-index: 70" onclick="closeProfilePhotoPreview()" role="dialog" aria-modal="true" aria-label="Pratinjau foto profil">
+    <div class="relative max-h-full max-w-3xl rounded-lg border border-slate-700 bg-slate-900 p-3 shadow-2xl" onclick="event.stopPropagation()">
+        <button type="button" onclick="closeProfilePhotoPreview()" aria-label="Tutup pratinjau foto" class="absolute right-5 top-5 z-10 rounded-md bg-slate-950/70 p-2 text-white hover:bg-slate-950">
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+        <img src="{{ $fotoProfilUrl }}" alt="Foto profil {{ $user->nama }} ukuran penuh" class="max-h-[80vh] max-w-full rounded-md object-contain">
     </div>
 </div>
 
