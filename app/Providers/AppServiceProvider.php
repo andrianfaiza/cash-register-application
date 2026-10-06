@@ -26,14 +26,18 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (Schema::hasTable('settings')) {
-            $setting = Setting::query()->firstOrCreate([]);
-            View::share('appSettings', $setting);
+        try {
+            if (Schema::hasTable('settings')) {
+                $setting = Setting::query()->firstOrCreate([]);
+                View::share('appSettings', $setting);
 
-            if (! empty($setting->bahasa)) {
-                app()->setLocale($setting->bahasa);
-                Carbon::setLocale($setting->bahasa);
+                if (! empty($setting->bahasa)) {
+                    app()->setLocale($setting->bahasa);
+                    Carbon::setLocale($setting->bahasa);
+                }
             }
+        } catch (\Throwable $e) {
+            // Database may be unavailable (e.g. during image build / config:cache); skip shared settings.
         }
 
         View::composer(['layouts.notification', 'layouts.topbar'], function ($view) {
