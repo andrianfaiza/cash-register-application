@@ -11,21 +11,21 @@
     <!-- Saldo Utama (Di Atas) -->
     <div class="mb-5">
         <p class="text-xs uppercase tracking-wider text-slate-400 font-semibold">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'TOTAL PROJECT BUDGET CEILING' : 'TOTAL PAGU ANGGARAN PROYEK' }}</p>
-        <h2 class="text-2xl font-bold mt-1">{{ format_currency($totalBudget) }}</h2>
+        <h2 class="text-2xl  text-slate-400 font-bold mt-1">{{ format_currency($totalBudget) }}</h2>
         <p class="text-[11px] text-slate-400 mt-1">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Budgeted across ' . $projects->where('status', 'aktif')->count() . ' active projects' : 'Dianggarkan dalam ' . $projects->where('status', 'aktif')->count() . ' proyek aktif' }}</p>
     </div>
 
     <!-- 2 Box di Dalam (Pemasukan & Pengeluaran) -->
     <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-800">
         <!-- Box Pemasukan -->
-        <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50">
+        <div class="app-card bg-slate-800/60 rounded-xl p-3 border border-slate-700/50">
             <p class="text-[10px] uppercase font-semibold text-slate-400 block">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'BUDGET REALIZATION' : 'REALISASI PENYERAPAN' }}</p>
-            <h2 class="text-sm font-bold text-emerald-400 mt-0.5 block">{{ format_currency($totalSpent) }}</h2>
+            <h2 class="text-sm font-bold text-slate-400 mt-0.5 block">{{ format_currency($totalSpent) }}</h2>
             <p class="text-[9px] text-slate-400 block mt-0.5">{{ ($appSettings->bahasa ?? 'id') === 'en' ? $persentaseRealisasi . ' of total ceiling' : $persentaseRealisasi . ' dari total pagu' }}</p>
         </div>
 
         <!-- Box Pengeluaran -->
-        <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50">
+        <div class="app-card bg-slate-800/60 rounded-xl p-3 border border-slate-700/50">
             <p class="text-[10px] uppercase font-semibold text-slate-400 block">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'REMAINING PROJECT BALANCE' : 'SISA SALDO PROYEK' }}</p>
             <p class="text-sm font-bold text-rose-400 mt-0.5 block">{{ format_currency($remainingBudget) }}</p>
             <p class="text-[9px] text-slate-400 block mt-0.5">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Available to disburse' : 'Tersedia untuk dicairkan' }}</p>
@@ -38,36 +38,27 @@
 <div class="hidden md:grid grid-cols-1 md:grid-cols-3 gap-5">
     <div class="bg-slate-900 text-white rounded-2xl p-6 shadow-sm border border-slate-800 flex flex-col justify-between">
          <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'TOTAL PROJECT BUDGET CEILING' : 'TOTAL PAGU ANGGARAN PROYEK' }}</p>
-        <p class="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-3">{{ format_currency($totalBudget) }}</p>
+        <p class="text-2xl font-bold text-white dark:text-slate-100 mt-3">{{ format_currency($totalBudget) }}</p>
         <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Budgeted across ' . $projects->where('status', 'aktif')->count() . ' active projects' : 'Dianggarkan dalam ' . $projects->where('status', 'aktif')->count() . ' proyek aktif' }}</p>
     </div>
 
     <!-- Card 2: Total Pemasukan -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
+    <div class="app-card bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-between">
         <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'BUDGET REALIZATION' : 'REALISASI PENYERAPAN' }}</p>
         <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-3">{{ format_currency($totalSpent) }}</p>
         <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">{{ ($appSettings->bahasa ?? 'id') === 'en' ? $persentaseRealisasi . ' of total ceiling' : $persentaseRealisasi . ' dari total pagu' }}</p>
     </div>
 
     <!-- Card 3: Total Pengeluaran -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
+    <div class="app-card bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-between">
         <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'REMAINING PROJECT BALANCE' : 'SISA SALDO PROYEK' }}</p>
-        <p class="text-2xl font-bold text-orange-500 mt-3">{{ format_currency($remainingBudget) }}</p>
+        <p class="text-2xl font-bold text-orange-500 dark:text-orange-400 mt-3">{{ format_currency($remainingBudget) }}</p>
         <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Available to disburse' : 'Tersedia untuk dicairkan' }}</p>
     </div>
-    {{-- <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
-       
-    </div>
-    <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
-        
-    </div>
-    <div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
-        
-    </div> --}}
 </div>
 
 {{-- DAFTAR PROYEK --}}
-<div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
+<div class="app-card bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5">
     <div class="flex items-center justify-between mb-5">
         <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Active Projects & Absorption' : 'Daftar Proyek Aktif & Penyerapan' }}</h2>
         <div class="flex items-center gap-2">
@@ -83,18 +74,39 @@
                 </svg>
                 {{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Delete' : 'Hapus' }}
             </button>
-            <button onclick="openProyekModal()" class="flex items-center gap-2 bg-slate-950 dark:bg-blue-600 hover:bg-slate-800 dark:hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg">
+            <button onclick="openProyekModal()" class="
+            /* --- Tampilan Mobile (Floating / Melayang) --- */
+                                    fixed bottom-20 right-10 z-50 
+                                    w-12 h-12 rounded-full 
+                                    flex items-center justify-center 
+                                    bg-blue-600 hover:bg-blue-500 
+                                    shadow-xl shadow-blue-600/40 border border-blue-400/30 
+                                    active:scale-95 transition-all
+                                    
+                                    /* --- Tampilan Desktop (Normal / In-line) --- */
+                                    sm:static sm:z-auto 
+                                    sm:w-auto sm:h-auto sm:rounded-lg 
+                                    sm:inline-flex sm:gap-2 
+                                    sm:bg-slate-950 dark:sm:bg-blue-600 
+                                    sm:hover:bg-slate-800 dark:sm:hover:bg-blue-700 
+                                    sm:shadow-none sm:border-none 
+                                    sm:px-4 sm:py-2 
+                                    
+                                    /* --- Text & Utility --- */
+                                    text-white text-sm font-medium">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                 </svg>
-                {{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Initiate Project' : 'Inisiasi Proyek' }}
+                <spa class="hidden sm:inline">
+                    {{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Initiate Project' : 'Inisiasi Proyek' }}
+                </span>
             </button>
         </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         @forelse ($projects as $project)
-            <div class="border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 rounded-xl p-4 relative">
+            <div class="app-card table-row-enter border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/40 rounded-xl p-4 relative" style="--motion-delay: {{ min($loop->index * 30, 360) }}ms">
                 <div class="hapus-col hidden absolute top-3 left-3">
                     <input type="checkbox" name="proyek_ids[]" value="{{ $project->id }}" class="proyek-checkbox rounded border-slate-300">
                 </div>

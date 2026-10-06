@@ -14,37 +14,37 @@
 <!-- ======================================================== -->
 <div class="block lg:hidden mb-6">
 <!-- Card Utama Warna Gelap/Biru -->
-<div class="bg-slate-900 text-white rounded-2xl p-5 shadow-lg">
+<div class="dashboard-card dashboard-enter bg-slate-900 text-white rounded-2xl p-5 shadow-lg">
     <!-- Saldo Utama (Di Atas) -->
     <div class="mb-5">
-        <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">Total Saldo Konsolidasi</span>
-        <h2 class="text-2xl font-bold mt-1">Rp 233.150.000</h2>
+        <span class="text-xs uppercase tracking-wider text-slate-400 font-semibold">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Total Consolidated Balance' : 'Total Saldo Konsolidasi' }}</span>
+        <h2 class="text-2xl font-bold mt-1">{{ format_currency($saldoKonsolidasi) }}</h2>
         <p class="text-[11px] text-slate-400 mt-1">
-            Saldo bersih dari transaksi sukses • <span class="text-emerald-400 font-medium">Likuiditas Sehat</span>
+            {{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Net balance from successful transactions' : 'Saldo bersih dari transaksi sukses' }} • <span class="text-emerald-400 font-medium">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Healthy Liquidity' : 'Likuiditas Sehat' }}</span>
         </p>
     </div>
 
     <!-- 2 Box di Dalam (Pemasukan & Pengeluaran) -->
     <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-800">
         <!-- Box Pemasukan -->
-        <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50">
-            <span class="text-[10px] uppercase font-semibold text-slate-400 block">Total Pemasukan</span>
-            <span class="text-sm font-bold text-emerald-400 mt-0.5 block">Rp 404.750.000</span>
-            <span class="text-[9px] text-slate-400 block mt-0.5">8 transaksi</span>
+        <div class="dashboard-card dashboard-enter bg-slate-800/60 rounded-xl p-3 border border-slate-700/50" style="--motion-delay: 70ms">
+            <span class="text-[10px] uppercase font-semibold text-slate-400 block">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Total Income' : 'Total Pemasukan' }}</span>
+            <span class="text-sm font-bold text-emerald-400 mt-0.5 block">{{ format_currency($pemasukan) }}</span>
+            <span class="text-[9px] text-slate-400 block mt-0.5">{{ $jumlahTransaksiMasuk }} {{ ($appSettings->bahasa ?? 'id') === 'en' ? 'transactions' : 'transaksi' }}</span>
         </div>
 
         <!-- Box Pengeluaran -->
-        <div class="bg-slate-800/60 rounded-xl p-3 border border-slate-700/50">
-            <span class="text-[10px] uppercase font-semibold text-slate-400 block">Total Pengeluaran</span>
-            <span class="text-sm font-bold text-rose-400 mt-0.5 block">Rp 171.600.000</span>
-            <span class="text-[9px] text-slate-400 block mt-0.5">11 pos</span>
+        <div class="dashboard-card dashboard-enter bg-slate-800/60 rounded-xl p-3 border border-slate-700/50" style="--motion-delay: 140ms">
+            <span class="text-[10px] uppercase font-semibold text-slate-400 block">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Total Expense' : 'Total Pengeluaran' }}</span>
+            <span class="text-sm font-bold text-rose-400 mt-0.5 block">{{ format_currency($pengeluaran) }}</span>
+            <span class="text-[9px] text-slate-400 block mt-0.5">{{ $jumlahPosKeluar }} {{ ($appSettings->bahasa ?? 'id') === 'en' ? 'posts' : 'pos' }}</span>
         </div>
     </div>
 </div>
 </div>
 <div class="hidden lg:grid grid-cols-1 md:grid-cols-3 gap-5">
     <!-- Card 1: Saldo Utama -->
-    <div class="bg-slate-900 text-white rounded-2xl p-6 shadow-sm border border-slate-800 flex flex-col justify-between">
+    <div class="dashboard-card dashboard-enter bg-slate-900 text-white rounded-2xl p-6 shadow-sm border border-slate-800 flex flex-col justify-between" style="--motion-delay: 0ms">
         <p class="text-xs font-semibold text-orange-500 tracking-wide">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'TOTAL CONSOLIDATED BALANCE' : 'TOTAL SALDO KONSOLIDASI' }}</p>
         <p class="text-2xl font-bold mt-3">{{ format_currency($saldoKonsolidasi) }}</p>
         <p class="text-xs text-slate-400 mt-3">
@@ -54,14 +54,14 @@
     </div>
 
     <!-- Card 2: Total Pemasukan -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
+    <div class="dashboard-card dashboard-enter bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-between" style="--motion-delay: 70ms">
         <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'TOTAL INCOME' : 'TOTAL PEMASUKAN' }}</p>
         <p class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-3">{{ format_currency($pemasukan) }}</p>
         <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'From ' . $jumlahTransaksiMasuk . ' successful transactions' : 'Dari ' . $jumlahTransaksiMasuk . ' transaksi sukses' }}</p>
     </div>
 
     <!-- Card 3: Total Pengeluaran -->
-    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
+    <div class="dashboard-card dashboard-enter bg-white dark:bg-slate-900 rounded-2xl p-6 shadow-sm border border-slate-100 dark:border-slate-800 flex flex-col justify-between" style="--motion-delay: 140ms">
         <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 tracking-wide">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'TOTAL EXPENSE' : 'TOTAL PENGELUARAN' }}</p>
         <p class="text-2xl font-bold text-red-500 dark:text-red-400 mt-3">{{ format_currency($pengeluaran) }}</p>
         <p class="text-xs text-slate-400 dark:text-slate-500 mt-3">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'From ' . $jumlahPosKeluar . ' operational & project posts' : 'Dari ' . $jumlahPosKeluar . ' pos operasional & proyek' }}</p>
@@ -73,7 +73,7 @@
 <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
 
     {{-- Tren Arus Kas Mingguan (Left 60%-65%) --}}
-    <div class="lg:col-span-8 xl:col-span-8 bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+    <div class="dashboard-card chart-enter lg:col-span-8 xl:col-span-8 bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 flex flex-col justify-between" style="--motion-delay: 70ms">
         <div class="flex items-center justify-between mb-4">
             <div>
                 <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Weekly Cashflow Trend' : 'Tren Arus Kas Mingguan' }}</h2>
@@ -156,7 +156,7 @@
 </div>
 
 {{-- TRANSAKSI TERBARU --}}
-<div class="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
+<div class="dashboard-card bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800">
     <div class="flex items-center justify-between mb-4">
         <div>
             <h2 class="text-sm font-semibold text-slate-800 dark:text-slate-200">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Recent Transactions' : 'Transaksi Terbaru' }}</h2>
@@ -179,7 +179,7 @@
             </thead>
             <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
                 @forelse ($recentTransactions as $transaction)
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+                    <tr class="table-row-enter hover:bg-slate-50 dark:hover:bg-slate-800/40 transition" style="--motion-delay: {{ min($loop->index * 30, 360) }}ms">
                         <td class="py-3.5 text-slate-500 dark:text-slate-400 whitespace-nowrap text-xs">{{ format_app_date($transaction->tanggal) }}</td>
                         <td class="py-3.5 font-medium text-slate-800 dark:text-slate-200">{{ $transaction->deskripsi ?: 'Tanpa deskripsi' }}</td>
                         <td class="py-3.5 text-orange-500 font-medium whitespace-nowrap text-xs">{{ ucfirst($transaction->kategori) }}</td>
@@ -204,7 +204,7 @@
 
     <div class="md:hidden space-y-3">
         @forelse ($recentTransactions as $transaction)
-            <div class="bg-slate-50 dark:bg-slate-800/40 rounded-lg p-3 border border-slate-100 dark:border-slate-800">
+            <div class="dashboard-card table-row-enter bg-slate-50 dark:bg-slate-800/40 rounded-lg p-3 border border-slate-100 dark:border-slate-800" style="--motion-delay: {{ min($loop->index * 30, 360) }}ms">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-xs text-slate-500 dark:text-slate-400">{{ format_app_date($transaction->tanggal) }}</span>
                     <span class="inline-block text-[11px] font-semibold px-2 py-0.5 rounded-full {{ $transaction->status === 'Sukses' ? 'bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400' : 'bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-400' }}">
@@ -243,7 +243,7 @@
             const masukData = weeksData.map(w => w.masuk);
             const keluarData = weeksData.map(w => w.keluar);
 
-            new Chart(lineCtx, {
+            const lineChart = new Chart(lineCtx, {
                 type: 'line',
                 data: {
                     labels: labels,
@@ -262,7 +262,7 @@
                             pointHoverBackgroundColor: '#ffffff',
                             pointHoverBorderColor: '#10b981',
                             pointRadius: 4,
-                            pointHoverRadius: 6,
+                            pointHoverRadius: 7,
                         },
                         {
                             label: 'Pengeluaran',
@@ -278,11 +278,13 @@
                             pointHoverBackgroundColor: '#ffffff',
                             pointHoverBorderColor: '#ef4444',
                             pointRadius: 4,
-                            pointHoverRadius: 6,
+                            pointHoverRadius: 7,
                         }
                     ]
                 },
+                plugins: [window.cashflowLineRevealPlugin],
                 options: {
+                    animation: false,
                     responsive: true,
                     maintainAspectRatio: false,
                     interaction: {
@@ -347,6 +349,8 @@
                     }
                 }
             });
+
+            window.animateCashflowLine(lineChart);
         }
 
         // 2. Doughnut Chart: Alokasi & Progres Proyek (Central Gauge)

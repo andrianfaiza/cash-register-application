@@ -16,22 +16,162 @@
             mode_tampilan: "{{ $appSettings->mode_tampilan ?? 'light' }}"
         };
     </script>
+    <style>
+        @keyframes dashboard-rise-in {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes chart-scale-in {
+            from { opacity: 0; transform: scale(.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes table-row-in {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-enter {
+            animation: dashboard-rise-in 420ms cubic-bezier(.16, 1, .3, 1) backwards;
+            animation-delay: var(--motion-delay, 0ms);
+        }
+
+        .chart-enter {
+            animation: chart-scale-in 460ms cubic-bezier(.16, 1, .3, 1) backwards;
+            animation-delay: var(--motion-delay, 0ms);
+        }
+
+        .table-row-enter {
+            animation: table-row-in 360ms ease-out backwards;
+            animation-delay: var(--motion-delay, 0ms);
+        }
+
+        .app-content > *:not(script),
+        .app-content > main > *:not(script) {
+            animation: dashboard-rise-in 420ms cubic-bezier(.16, 1, .3, 1) both;
+        }
+
+        .app-content > *:nth-child(2),
+        .app-content > main > *:nth-child(2) {
+            animation-delay: 60ms;
+        }
+
+        .app-content > *:nth-child(3),
+        .app-content > main > *:nth-child(3) {
+            animation-delay: 120ms;
+        }
+
+        .app-content > *:nth-child(4),
+        .app-content > main > *:nth-child(4) {
+            animation-delay: 180ms;
+        }
+
+        .app-card {
+            animation: dashboard-rise-in 420ms cubic-bezier(.16, 1, .3, 1) backwards;
+            transition: transform 180ms ease-out, box-shadow 180ms ease-out;
+        }
+
+        .dashboard-card {
+            transition: transform 180ms ease-out, box-shadow 180ms ease-out;
+        }
+
+        .dark .project-budget-total {
+            color: #fff;
+        }
+
+        .app-content .app-card:nth-of-type(2) { animation-delay: 70ms; }
+        .app-content .app-card:nth-of-type(3) { animation-delay: 140ms; }
+
+        .app-content tbody tr:not(.table-row-enter) {
+            animation: table-row-in 360ms ease-out both;
+        }
+
+        .app-content tbody tr:not(.table-row-enter):nth-child(2) { animation-delay: 30ms; }
+        .app-content tbody tr:not(.table-row-enter):nth-child(3) { animation-delay: 60ms; }
+        .app-content tbody tr:not(.table-row-enter):nth-child(4) { animation-delay: 90ms; }
+        .app-content tbody tr:not(.table-row-enter):nth-child(5) { animation-delay: 120ms; }
+        .app-content tbody tr:not(.table-row-enter):nth-child(6) { animation-delay: 150ms; }
+
+        @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+            .app-card:hover, .dashboard-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 12px 24px -12px rgb(15 23 42 / .28);
+            }
+        }
+
+        button, select {
+            transition-duration: 180ms;
+            transition-timing-function: ease-out;
+        }
+
+        button:active {
+            transform: scale(.95);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                animation-delay: 0ms !important;
+                scroll-behavior: auto !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
     <script src="{{ asset('js/profile.js') }}"></script>
     <script src="{{ asset('js/date.js') }}"></script>
     <script src="{{ asset('js/notification.js') }}"></script>
     <script src="{{ asset('js/settings.js') }}"></script>
-    <script src="{{ asset('js/sidebar.js') }}"></script>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        window.cashflowLineRevealPlugin = {
+            id: 'cashflowLineReveal',
+            beforeDatasetsDraw(chart) {
+                if (!chart.chartArea) return;
+                const { ctx, chartArea } = chart;
+                const progress = chart.$lineRevealProgress ?? 0;
+                ctx.save();
+                ctx.beginPath();
+                ctx.rect(chartArea.left, chartArea.top, chartArea.width * progress, chartArea.height);
+                ctx.clip();
+                chart.$lineRevealClipped = true;
+            },
+            afterDatasetsDraw(chart) {
+                if (chart.$lineRevealClipped) {
+                    chart.ctx.restore();
+                    chart.$lineRevealClipped = false;
+                }
+            }
+        };
+
+        window.animateCashflowLine = function (chart) {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                chart.$lineRevealProgress = 1;
+                chart.draw();
+                return;
+            }
+
+            const startedAt = performance.now();
+            const drawFrame = (timestamp) => {
+                const linearProgress = Math.min((timestamp - startedAt) / 900, 1);
+                chart.$lineRevealProgress = linearProgress * linearProgress * (3 - 2 * linearProgress);
+                chart.draw();
+                if (linearProgress < 1) requestAnimationFrame(drawFrame);
+            };
+            requestAnimationFrame(drawFrame);
+        };
+    </script>
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 h-screen overflow-hidden">
     <div class="flex h-full w-full overflow-hidden">
 
         {{-- SIDEBAR - Desktop only --}}
-        <aside id="sidebar" class="hidden lg:flex lg:static w-16 group md:hover:w-64 transition-all duration-300 ease-in-out bg-slate-950 text-white flex flex-col justify-between shrink-0">
+        <aside id="sidebar" class="hidden lg:flex lg:static w-16 shrink-0 bg-slate-950 text-white flex-col justify-between">
             @include('layouts.sidebar')
         </aside>
 
@@ -43,7 +183,7 @@
                 @include('layouts.topbar')
             </header>
 
-            <main class="flex-1 px-4 md:px-8 py-3 space-y-4 overflow-y-auto pb-20 lg:pb-0">
+            <main id="appContent" class="app-content flex-1 px-4 md:px-8 py-3 space-y-4 overflow-y-auto pb-20 lg:pb-0">
                 @yield('content')
             </main>
         </div>
