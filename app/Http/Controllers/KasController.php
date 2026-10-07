@@ -42,6 +42,45 @@ class KasController extends Controller
         return redirect()->intended(route('dashboard'));
     }
 
+    /**
+     * Tampilkan halaman auth (login & register) dengan tab yang sesuai.
+     */
+    public function showAuth(Request $request): View
+    {
+        return view('auth', [
+            'mode' => $request->routeIs('register.page') ? 'register' : 'login',
+        ]);
+    }
+
+    public function register(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
+            'foto' => 'no-profile.jpg',
+        ]);
+
+        Auth::login($user);
+        $request->session()->regenerate();
+        $request->session()->put('login_at', now()->toDateTimeString());
+        LoginActivity::create([
+            'user_id' => $user->id,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'status' => 'Berhasil',
+            'logged_in_at' => now(),
+        ]);
+
+        return redirect()->intended(route('dashboard'));
+    }
+
     public function dashboard(): View
     {
         $successful = Transaction::query()->where('status', 'Sukses');
