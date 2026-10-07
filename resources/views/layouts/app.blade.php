@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>@yield('title')</title>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -47,10 +49,10 @@
             animation-delay: var(--motion-delay, 0ms);
         }
 
-        .app-content > *:not(script),
+        /* .app-content > *:not(script),
         .app-content > main > *:not(script) {
             animation: dashboard-rise-in 420ms cubic-bezier(.16, 1, .3, 1) both;
-        }
+        } */
 
         .app-content > *:nth-child(2),
         .app-content > main > *:nth-child(2) {
@@ -217,6 +219,7 @@
             }
         }
     </script>
+    
 
     @include('layouts.mobile-nav')
 </body>

@@ -26,13 +26,16 @@
                         </svg>
                         <span class="text-center text-[9px] leading-3">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Projects' : 'Proyek' }}</span>
                     </a>
-                    <a href="{{ route('transaksi')}}" title="{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Transactions' : 'Transaksi' }}" class="flex min-h-14 flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg 
-                    {{ request()->routeIs('transaksi') ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }} text-sm font-medium transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4M16 17H4m0 0l4 4m-4-4l4-4" />
-                        </svg>
-                        <span class="text-center text-[9px] leading-3">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Transactions' : 'Transaksi' }}</span>
-                    </a>
+                   <a href="{{ route('transaksi')}}" 
+                        title="{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Transactions' : 'Transaksi' }}" 
+                        class="flex min-h-14 flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg {{ request()->routeIs('transaksi') ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }} text-sm font-medium transition-colors">
+                            
+                            <!-- Cukup 1 SVG Ikon Transaksi saja -->
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4M16 17H4m0 0l4 4m-4-4l4-4" />
+                            </svg>
+                            <span class="text-center text-[9px] leading-3">{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Transactions' : 'Transaksi' }}</span>
+                        </a>
                     <a href="{{ route('laporan')}}" title="{{ ($appSettings->bahasa ?? 'id') === 'en' ? 'Reports' : 'Laporan' }}" class="flex min-h-14 flex-col items-center justify-center gap-1 px-1 py-2 rounded-lg 
                     {{ request()->routeIs('laporan') ? 'bg-blue-600 text-white' : 'text-slate-400 hover:bg-slate-900 hover:text-white' }} text-sm font-medium transition-colors">
                         {{-- <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
