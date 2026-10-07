@@ -37,7 +37,7 @@
         <!-- Profile Icon (Mobile Only) -->
         <div class="relative lg:hidden">
             <button type="button" onclick="toggleAccountMenu()" class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-                <img src="{{ auth()->user()?->foto ? (str_starts_with(auth()->user()->foto, 'foto-profil') ? asset('storage/' . auth()->user()->foto) : asset(auth()->user()->foto)) : asset('no-profile.jpg') }}" alt="{{ auth()->user()?->name ?? 'Pengguna' }}" class="w-8 h-8 rounded-full object-cover">
+                <img src="{{ auth()->user()?->foto ? (str_starts_with(auth()->user()->foto, 'foto-profil') ? asset('storage/' . auth()->user()->foto) : asset(auth()->user()->foto)) : asset('no-profile.jpg') }}" onerror="this.onerror=null;this.src='{{ asset('no-profile.jpg') }}';" alt="{{ auth()->user()?->name ?? 'Pengguna' }}" class="w-8 h-8 rounded-full object-cover">
             </button>
             <div id="accountDropdownMobile" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-100 dark:border-slate-800 py-1 z-50">
                 <div class="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800">

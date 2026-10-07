@@ -18,7 +18,13 @@
         $user->jabatan = $user->jabatan ?? 'Finance Admin';
         $user->status = $user->status ?? 'Aktif';
         $user->foto = $user->foto ?? 'no-profile.jpg';
-        $fotoProfilUrl = str_starts_with($user->foto, 'foto-profil') ? asset('storage/' . $user->foto) : asset($user->foto);
+        // Pastikan file benar-benar ada sebelum URL-nya dipakai (hindari gambar rusak).
+        $fotoProfilUrl = asset($user->foto);
+        if (str_starts_with($user->foto, 'foto-profil')) {
+            $fotoProfilUrl = \Illuminate\Support\Facades\Storage::disk('public')->exists($user->foto)
+                ? asset('storage/' . $user->foto)
+                : asset('no-profile.jpg');
+        }
         $user->telepon = $user->telepon ?? '-';
         $user->nip = $user->nip ?? '-';
         $user->departemen = $user->departemen ?? 'Finance & Accounting';
@@ -42,7 +48,7 @@
         <div class="app-card bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-6 flex flex-col items-center text-center">
             <div class="relative">
                 <button type="button" id="profilePhotoMenuButton" aria-expanded="false" aria-controls="profilePhotoMenu" onclick="toggleProfilePhotoMenu(event)" class="h-28 w-28 overflow-hidden rounded-lg border border-slate-200 bg-slate-100 transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-slate-700 dark:bg-slate-800">
-                    <img id="profileAvatar" src="{{ $fotoProfilUrl }}" alt="Foto profil {{ $user->nama }}" class="h-full w-full object-cover">
+                    <img id="profileAvatar" src="{{ $fotoProfilUrl }}" onerror="this.onerror=null;this.src='{{ asset('no-profile.jpg') }}';" alt="Foto profil {{ $user->nama }}" class="h-full w-full object-cover">
                 </button>
                 <form id="avatarForm" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="hidden">
                     @csrf
@@ -283,7 +289,7 @@
         <button type="button" onclick="closeProfilePhotoPreview()" aria-label="Tutup pratinjau foto" class="absolute right-5 top-5 z-10 rounded-md bg-slate-950/70 p-2 text-white hover:bg-slate-950">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
-        <img src="{{ $fotoProfilUrl }}" alt="Foto profil {{ $user->nama }} ukuran penuh" class="max-h-[80vh] max-w-full rounded-md object-contain">
+        <img src="{{ $fotoProfilUrl }}" onerror="this.onerror=null;this.src='{{ asset('no-profile.jpg') }}';" alt="Foto profil {{ $user->nama }} ukuran penuh" class="max-h-[80vh] max-w-full rounded-md object-contain">
     </div>
 </div>
 
