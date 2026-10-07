@@ -107,6 +107,20 @@
             transition-timing-function: ease-out;
         }
 
+        /*
+         * Ruang ekstra di bawah konten mobile agar tidak tertutup
+         * bottom navigation (termasuk safe area iPhone / Android gesture).
+         */
+        #appContent {
+            padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+        }
+
+        @media (min-width: 1024px) {
+            #appContent {
+                padding-bottom: 2rem;
+            }
+        }
+
         button:active {
             transform: scale(.95);
         }
@@ -185,7 +199,7 @@
                 @include('layouts.topbar')
             </header>
 
-            <main id="appContent" class="app-content flex-1 px-4 md:px-8 py-3 space-y-4 overflow-y-auto pb-20 lg:pb-0">
+            <main id="appContent" class="app-content flex-1 px-4 md:px-8 py-3 space-y-4 overflow-y-auto">
                 @yield('content')
             </main>
         </div>

@@ -1,4 +1,4 @@
-<nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 z-50">
+<nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 z-50" style="padding-bottom: env(safe-area-inset-bottom);">
     <div class="flex items-center justify-around">
         <a href="{{ route('dashboard') }}" class="flex flex-col items-center py-2 px-3 min-w-0 flex-1 {{ request()->routeIs('dashboard') ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400' }}">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
