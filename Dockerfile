@@ -25,9 +25,11 @@ WORKDIR /var/www
 
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader
+# Tambahkan --no-scripts agar tidak gagal membaca DB saat build
+RUN composer install --no-dev --optimize-autoloader --no-scripts
 RUN npm install && npm run build
 
 EXPOSE 10000
 
-CMD php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=10000
+# Bungkus CMD dengan sh -c agar perintah berurutan jalan dengan benar
+CMD sh -c "php artisan package:discover --ansi && php artisan config:cache && php artisan route:cache && php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=10000"
