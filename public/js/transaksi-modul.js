@@ -232,9 +232,14 @@ function openDetailModal(id) {
         buktiLink.href = data.bukti;
 
         if (data.bukti_gambar) {
+            buktiImg.onerror = function () {
+                // Gambar tidak bisa dimuat: sembunyikan pratinjau, tetap sisakan tombol unduh.
+                buktiImg.classList.add('hidden');
+            };
             buktiImg.src = data.bukti;
             buktiImg.classList.remove('hidden');
         } else {
+            buktiImg.removeAttribute('src');
             buktiImg.classList.add('hidden');
         }
     } else {

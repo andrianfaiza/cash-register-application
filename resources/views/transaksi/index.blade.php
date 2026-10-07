@@ -4,7 +4,6 @@
 @section('page-title', 'Transaksi')
 @section('description', 'Pencatatan kas masuk-keluar, kategori, dan tag proyek.')
 @section('content')
-            <main class="flex-1 overflow-y-auto px-8 py-5 space-y-5">
 
                 {{-- FILTER BAR --}}
                 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
