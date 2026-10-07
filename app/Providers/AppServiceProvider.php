@@ -35,6 +35,10 @@ class AppServiceProvider extends ServiceProvider
                 Carbon::setLocale($setting->bahasa);
             }
         }
+        // Paksa HTTPS di environment produksi/Render
+        if (config('app.env') === 'production' || request()->header('X-Forwarded-Proto') === 'https') {
+            URL::forceScheme('https');
+        }
 
         View::composer(['layouts.notification', 'layouts.topbar'], function ($view) {
             $notifications = collect();
