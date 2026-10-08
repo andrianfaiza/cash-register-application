@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>@yield('title')</title>
+    <title>@yield('title')    <meta name="csrf-token" content="{{ csrf_token() }}">
+</title>
+	@vite(['resources/css/app.css', 'resources/js/app.js'])
     <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
