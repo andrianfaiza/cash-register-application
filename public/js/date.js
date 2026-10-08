@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('turbo:load', function() {
     const settings = window.__APP_SETTINGS__ || { bahasa: 'id', format_tanggal: 'dd/mm/yyyy' };
     const isEnglish = settings.bahasa === 'en';
     const localeCode = isEnglish ? 'en-US' : 'id-ID';
