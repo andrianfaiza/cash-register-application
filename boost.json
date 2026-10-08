@@ -1,0 +1,29 @@
+{
+    "agents": [
+        "cursor",
+        "antigravity",
+        "opencode",
+        "copilot",
+        "claude_code"
+    ],
+    "cloud": true,
+    "guidelines": true,
+    "mcp": true,
+    "nightwatch": false,
+    "packages": [
+        "hotwired-laravel/turbo-laravel"
+    ],
+    "sail": false,
+    "skills": [
+        "infer-conventions",
+        "deploying-to-cloud",
+        "laravel-best-practices",
+        "testing-best-practices",
+        "tailwindcss-development",
+        "developing-with-turbo-basics",
+        "developing-with-turbo-drive",
+        "developing-with-turbo-frames",
+        "developing-with-turbo-streams",
+        "developing-with-turbo-tests"
+    ]
+}
