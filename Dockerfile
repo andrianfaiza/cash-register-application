@@ -16,13 +16,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libonig-dev \
     libxml2-dev \
     libzip-dev \
-    libpq-dev \
-    sqlite3 \
-    libsqlite3-dev \
-    && docker-php-ext-install pdo_pgsql pdo_sqlite mbstring exif pcntl bcmath gd zip \
+    default-mysql-client \
+    && docker-php-ext-install pdo_mysql mysqli mbstring exif pcntl bcmath gd zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 COPY . .
