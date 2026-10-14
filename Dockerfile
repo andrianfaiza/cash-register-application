@@ -21,10 +21,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+
 # Salin binary Composer dari official image ke stage ini
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Setelah itu baru jalankan perintah composer install kamu
+# SALIN KODE PROYEK TERLEBIH DAHULU (Agar composer.json ada di /app)
+COPY . .
+
+# Jalankan composer install
 RUN rm -rf node_modules public/build \
     && composer install --no-dev --optimize-autoloader --no-interaction --no-scripts \
     && mkdir -p public/build
