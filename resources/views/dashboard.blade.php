@@ -85,7 +85,7 @@
             </div>
         </div>
 
-        <div class="relative h-64 sm:h-72 w-full">
+        <div wire:ignore class="relative h-64 sm:h-72 w-full">
             <canvas id="weeklyCashflowChart"></canvas>
         </div>
     </div>
@@ -102,7 +102,7 @@
 
         {{-- Doughnut Chart with Central Progress / Text --}}
         <div class="relative flex items-center justify-center my-2">
-            <div class="relative w-48 h-48 sm:w-52 sm:h-52">
+            <div wire:ignore class="relative w-48 h-48 sm:w-52 sm:h-52">
                 <canvas id="projectDoughnutChart"></canvas>
 
                 {{-- Central Text / Gauge Metric --}}
@@ -230,7 +230,7 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('livewire:navigated', function () {
         const isDarkMode = document.documentElement.classList.contains('dark');
         const textColor = isDarkMode ? '#94a3b8' : '#64748b';
         const gridColor = isDarkMode ? 'rgba(51, 65, 85, 0.4)' : 'rgba(226, 232, 240, 0.8)';
