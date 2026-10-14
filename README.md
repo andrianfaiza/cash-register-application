@@ -1,59 +1,143 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Nusa Kas
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Nusa Kas is a web application for recording cash inflows and outflows, organizing project budgets, and reviewing financial activity. It provides an Indonesian-first interface with configurable language, currency, date, and display preferences.
 
-## About Laravel
+> **Important:** This application currently does not isolate transactions, projects, or settings by user. All authenticated users share the same ledger and application settings. Do not use it for sensitive or production financial data until access control and data ownership have been implemented and reviewed.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Key Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Dashboard summaries for successful income and expenses, recent transactions, weekly cash flow, and active project budget progress.
+- Create, edit, filter, paginate, and delete income and expense transactions.
+- Attach receipt images or PDF files to transactions (maximum upload size: 5 MB).
+- Manage projects, budgets, schedules, departments, and project status.
+- Search transactions and projects.
+- View monthly reports, download transaction data as CSV, and print reports or save them as PDF through the browser.
+- Manage a profile, profile photo, password, and login activity.
+- Configure language, currency display, date format, theme, and notification preferences.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Technology Stack
 
-## Learning Laravel
+- PHP `^8.2` and Laravel `^12.0`
+- Blade templates and Eloquent ORM
+- Livewire `^4.4` and Turbo Laravel `^2.6` dependencies
+- SQLite by default; Laravel also includes MySQL, MariaDB, PostgreSQL, and SQL Server connection configuration
+- Vite `^7` and Tailwind CSS `^4`
+- JavaScript assets, with Alpine.js, Chart.js, and Flatpickr loaded by the interface from CDNs
+- PHPUnit `^11.5` for automated tests
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+Composer and npm dependency versions are defined in [composer.json](composer.json) and [package.json](package.json); lockfiles pin the versions installed by this repository.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Requirements
 
-## Laravel Sponsors
+- PHP 8.2 or newer with the extensions required by Laravel, including PDO SQLite for the default local database
+- Composer
+- Node.js 20.19+ or 22.12+, with npm
+- Git
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+The Docker build uses Node.js 22 for frontend assets and PHP 8.3 for the application runtime.
 
-### Premium Partners
+## Installation
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Clone the repository and enter its directory:
 
-## Contributing
+```sh
+git clone <repository-url>
+cd kas
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Create the SQLite database file, then run the repository setup script. The setup script installs Composer and npm dependencies, creates `.env` from `.env.example` if needed, generates the application key, runs database migrations, and builds frontend assets.
 
-## Code of Conduct
+```sh
+php -r "file_exists('database/database.sqlite') || touch('database/database.sqlite');"
+composer setup
+php artisan storage:link
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Start the local application services:
 
-## Security Vulnerabilities
+```sh
+composer run dev
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+The Laravel development server is available at <http://localhost:8000>. The command also starts the queue listener, log viewer, and Vite development server.
+
+## Configuration
+
+The default local configuration in `.env.example` uses SQLite, database-backed sessions/cache/queues, local file storage, and the log mailer. Review these values in `.env` before running the application:
+
+| Variable | Purpose |
+| --- | --- |
+| `APP_NAME`, `APP_URL` | Application name and base URL |
+| `APP_KEY` | Encryption key; generated by `composer setup` |
+| `DB_CONNECTION`, `DB_DATABASE` or `DB_URL` | Database driver and connection |
+| `SESSION_DRIVER`, `CACHE_STORE`, `QUEUE_CONNECTION` | Session, cache, and queue backends |
+| `FILESYSTEM_DISK` | Storage disk for uploaded files |
+| `MAIL_MAILER` and `MAIL_*` | Outgoing mail configuration; `log` is the local default |
+
+For a database other than SQLite, configure its connection variables and ensure the matching PHP PDO extension is installed. Configure a durable filesystem disk when uploaded receipts must persist across deployments.
+
+## Demo Data
+
+To load sample projects, transactions, settings, and users, run:
+
+```sh
+php artisan db:seed
+```
+
+**Warning:** the seeder truncates existing transaction, project, and settings records before recreating sample data. Run it only against a disposable development database. It also creates accounts with credentials defined in [KasSeeder.php](database/seeders/KasSeeder.php); those credentials are for local demos only and must never be used in a public or production environment.
+
+The container entrypoint currently seeds the database when it finds no users. Review and change this behavior before any production deployment.
+
+## Tests and Build
+
+Run the test suite:
+
+```sh
+composer test
+```
+
+Build production frontend assets:
+
+```sh
+npm run build
+```
+
+The test environment is configured to use an in-memory SQLite database in [phpunit.xml](phpunit.xml).
+
+## Project Structure
+
+```text
+app/Http/Controllers/   Request handling and application workflows
+app/Models/             Eloquent models
+database/migrations/    Database schema
+database/seeders/       Demo data
+resources/views/        Blade pages and layouts
+resources/js/           Vite JavaScript entry point
+resources/css/          Application styles
+public/js/              Page-specific JavaScript assets
+routes/web.php          Web routes
+tests/                  PHPUnit tests
+```
+
+## Deployment
+
+The repository includes a [Dockerfile](Dockerfile), a [container entrypoint](docker/entrypoint.sh), and a [Render blueprint](render.yaml). They are useful as deployment starting points, but the current Render configuration is **not production-ready**:
+
+- Render is configured for PostgreSQL, but the Docker image installs `pdo_mysql` and does not install `pdo_pgsql`.
+- The blueprint expects an externally supplied `DB_URL`; it does not provision a PostgreSQL database.
+- Uploaded receipts use local storage, and the Render blueprint does not define a persistent disk. Files may be lost when the service is redeployed or restarted.
+- The entrypoint runs migrations and seeds demo data when the database has no users, including accounts with known demo credentials.
+
+Before deployment, install the PDO extension matching the chosen database, provision and configure a durable database, use persistent/object storage for uploads, and remove or secure automatic demo seeding. Set `APP_ENV=production`, `APP_DEBUG=false`, a unique `APP_KEY`, the correct `APP_URL`, and production mail/session/cache/queue settings. Back up the database and uploaded files.
+
+## Known Limitations
+
+- Ledger records and settings are shared by all authenticated users; user-level ownership and authorization boundaries are not implemented.
+- The report view covers the current calendar month; its period is not a configurable date-range filter.
+- The route labeled as an Excel export downloads CSV data, not an `.xlsx` workbook.
+- The PDF option serves print-friendly HTML; use the browser's print dialog to save it as a PDF.
+- Password recovery is not implemented; the forgot-password link is a placeholder.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+No repository-level `LICENSE` file is currently provided. The project license has not been specified.
