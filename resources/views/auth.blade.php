@@ -139,7 +139,7 @@
                     </svg>
                 </div>
                 <div>
-                    <p class="text-lg font-bold text-slate-900 leading-tight">KAS ERP</p>
+                    <p class="text-lg font-bold text-slate-900 leading-tight">Nusa Kas</p>
                     <p class="text-xs text-slate-500 leading-tight">PT. Winner Nusantara Jaya Tbk</p>
                 </div>
             </div>
