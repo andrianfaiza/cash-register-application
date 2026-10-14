@@ -21,9 +21,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY . .
+# Salin binary Composer dari official image ke stage ini
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Buang node_modules & build lama dari konteks, lalu pasang hasil build dari stage 1
+# Setelah itu baru jalankan perintah composer install kamu
 RUN rm -rf node_modules public/build \
     && composer install --no-dev --optimize-autoloader --no-interaction --no-scripts \
     && mkdir -p public/build
