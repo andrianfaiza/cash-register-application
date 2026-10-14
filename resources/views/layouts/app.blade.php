@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>@yield('title')    <meta name="csrf-token" content="{{ csrf_token() }}">
-</title>
+    <title>@yield('title')</title>
 	@vite(['resources/css/app.css', 'resources/js/app.js'])
+    @livewireStyles
     <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -186,6 +186,7 @@
     </script>
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-100 h-screen overflow-hidden">
+    @livewireScripts
     <div class="flex h-full w-full overflow-hidden">
 
         {{-- SIDEBAR - Desktop only --}}

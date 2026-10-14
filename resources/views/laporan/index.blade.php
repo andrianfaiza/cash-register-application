@@ -45,7 +45,7 @@
         </div>
 
         @if (count($flux) > 0)
-            <div class="relative h-48 w-full">
+            <div wire:ignore class="relative h-48 w-full">
                 <canvas id="netCashflowChart"></canvas>
             </div>
         @else
@@ -141,7 +141,7 @@
 
 @if (count($flux) > 0)
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('livewire:navigated', function () {
         const ctx = document.getElementById('netCashflowChart');
         if (!ctx) return;
 
