@@ -185,4 +185,4 @@ function handleProyekSubmit() {
     return true;
 }
 
-document.addEventListener('DOMContentLoaded', initProyekData);
+document.addEventListener('livewire:navigated', initProyekData);

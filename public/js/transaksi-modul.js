@@ -274,4 +274,4 @@ function closeDetailModal() {
     }, 200);
 }
 
-document.addEventListener('DOMContentLoaded', initTransaksiData);
+document.addEventListener('livewire:navigated', initTransaksiData);

@@ -2,12 +2,15 @@
 
 namespace App\Providers;
 
+use App\Models\Project;
 use App\Models\Setting;
+use App\Models\Transaction;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Carbon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,7 +30,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if (Schema::hasTable('settings')) {
-            $setting = Setting::query()->firstOrCreate([]);
+            $setting = Cache::rememberForever('app_settings', fn () => Setting::query()->firstOrCreate([]));
             View::share('appSettings', $setting);
 
             if (! empty($setting->bahasa)) {
@@ -44,34 +47,38 @@ class AppServiceProvider extends ServiceProvider
             $notifications = collect();
             if (Schema::hasTable('transactions') && Schema::hasTable('projects')) {
                 // 1. Pending transactions (Menunggu Verifikasi)
-                $pendingTransactions = \App\Models\Transaction::query()->where('status', 'Pending')->latest('tanggal')->limit(4)->get();
+                $pendingTransactions = Transaction::query()->where('status', 'Pending')->latest('tanggal')->limit(4)->get();
                 foreach ($pendingTransactions as $pt) {
                     $notifications->push([
-                        'id' => 'tx-' . $pt->id,
+                        'id' => 'tx-'.$pt->id,
                         'type' => 'pending',
                         'title' => 'Menunggu Verifikasi',
                         'title_en' => 'Pending Verification',
-                        'message' => ($pt->tipe === 'masuk' ? 'Pemasukan ' : 'Pengeluaran ') . format_currency($pt->nominal) . ' - ' . ($pt->deskripsi ?: ucfirst($pt->kategori)),
-                        'time' => $pt->tanggal ? format_app_date($pt->tanggal) : 'Baru saja',
+                        'message' => ($pt->tipe === 'masuk' ? 'Pemasukan ' : 'Pengeluaran ').format_currency($pt->nominal).' - '.($pt->deskripsi ?: ucfirst($pt->kategori)),
+                        'time' => format_app_date($pt->tanggal),
                         'icon' => 'warning',
                         'url' => route('transaksi', ['status' => 'Pending']),
                         'unread' => true,
                     ]);
                 }
 
-                // 2. Budget Alert (>= 80%)
-                $projects = \App\Models\Project::query()->where('status', 'aktif')->where('pagu_anggaran', '>', 0)->get();
+                // 2. Budget Alert (>= 80%) — hitung terpakai lewat agregat SQL (hindari N+1)
+                $projects = Project::query()
+                    ->where('status', 'aktif')
+                    ->where('pagu_anggaran', '>', 0)
+                    ->withSum(['transactions as spent' => fn ($query) => $query->where('tipe', 'keluar')->where('status', 'Sukses')], 'nominal')
+                    ->get();
                 foreach ($projects as $proj) {
-                    $spent = \App\Models\Transaction::query()->where('proyek_id', $proj->id)->where('tipe', 'keluar')->where('status', 'Sukses')->sum('nominal');
+                    $spent = (int) ($proj->spent ?? 0);
                     $progress = round(($spent / $proj->pagu_anggaran) * 100);
                     if ($progress >= 80) {
                         $notifications->push([
-                            'id' => 'proj-' . $proj->id,
+                            'id' => 'proj-'.$proj->id,
                             'type' => 'budget_alert',
                             'title' => 'Peringatan Anggaran',
                             'title_en' => 'Budget Limit Alert',
-                            'message' => 'Proyek ' . $proj->nama_proyek . ' telah mencapai ' . $progress . '% pagu anggaran.',
-                            'time' => 'Pagu: ' . format_currency($proj->pagu_anggaran),
+                            'message' => 'Proyek '.$proj->nama_proyek.' telah mencapai '.$progress.'% pagu anggaran.',
+                            'time' => 'Pagu: '.format_currency($proj->pagu_anggaran),
                             'icon' => 'alert',
                             'url' => route('proyek'),
                             'unread' => true,
@@ -80,15 +87,15 @@ class AppServiceProvider extends ServiceProvider
                 }
 
                 // 3. Transaksi sukses terkini
-                $recentSuccess = \App\Models\Transaction::query()->where('status', 'Sukses')->latest('tanggal')->latest('id')->limit(2)->get();
+                $recentSuccess = Transaction::query()->where('status', 'Sukses')->latest('tanggal')->latest('id')->limit(2)->get();
                 foreach ($recentSuccess as $st) {
                     $notifications->push([
-                        'id' => 'succ-' . $st->id,
+                        'id' => 'succ-'.$st->id,
                         'type' => 'success',
                         'title' => $st->tipe === 'masuk' ? 'Pemasukan Terverifikasi' : 'Pengeluaran Terverifikasi',
                         'title_en' => $st->tipe === 'masuk' ? 'Income Verified' : 'Expense Recorded',
-                        'message' => ($st->deskripsi ?: ucfirst($st->kategori)) . ' (' . format_currency($st->nominal) . ')',
-                        'time' => $st->tanggal ? format_app_date($st->tanggal) : 'Terkini',
+                        'message' => ($st->deskripsi ?: ucfirst($st->kategori)).' ('.format_currency($st->nominal).')',
+                        'time' => format_app_date($st->tanggal),
                         'icon' => 'check',
                         'url' => route('transaksi'),
                         'unread' => false,
@@ -104,4 +111,3 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 }
-

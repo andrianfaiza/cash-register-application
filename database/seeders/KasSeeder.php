@@ -8,7 +8,7 @@ use App\Models\Transaction;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 
@@ -27,11 +27,13 @@ class KasSeeder extends Seeder
         Schema::enableForeignKeyConstraints();
 
         // 1. SEED / UPDATE USER ADMIN
+        // Kredensial dapat dioverride lewat env agar produksi tidak memakai
+        // password default yang tertulis di kode.
         $admin = User::firstOrCreate(
-            ['email' => 'admin@gmail.com'],
+            ['email' => env('ADMIN_EMAIL', 'admin@gmail.com')],
             [
                 'name' => 'Admin Keuangan',
-                'password' => Hash::make('12345678'),
+                'password' => Hash::make(env('ADMIN_PASSWORD', '12345678')),
                 'nip' => 'KAS-2026-001',
                 'departemen' => 'Keuangan & Akuntansi',
                 'telepon' => '081234567890',
@@ -61,6 +63,7 @@ class KasSeeder extends Seeder
                 'notif_sistem' => true,
             ]
         );
+        Cache::forget('app_settings');
 
         // 3. SEED PROYEK CONTOH
         $proyekERP = Project::create([

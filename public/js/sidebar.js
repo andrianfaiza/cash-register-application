@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('livewire:navigated', function () {
     const sidebar = document.getElementById('sidebar');
     if (!sidebar) return;
     let hoverTimer = null;
