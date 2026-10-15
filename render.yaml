@@ -19,17 +19,37 @@ services:
         sync: false
       - key: APP_LOCALE
         value: id
+      - key: APP_TIMEZONE
+        value: Asia/Jakarta
       - key: LOG_CHANNEL
         value: stderr
+      - key: LOG_LEVEL
+        value: warning
       - key: DB_CONNECTION
         value: pgsql
       - key: DB_URL
         sync: false
       - key: SESSION_DRIVER
         value: database
+      - key: SESSION_SECURE_COOKIE
+        value: "true"
+      - key: SESSION_SAME_SITE
+        value: lax
       - key: CACHE_STORE
         value: database
       - key: QUEUE_CONNECTION
-        value: sync
+        value: database
       - key: FILESYSTEM_DISK
         value: local
+      # Disk bukti transaksi. Ubah ke "s3" dan isi kredensial AWS_* di bawah
+      # agar file tidak hilang saat redeploy (disk lokal bersifat ephemeral).
+      - key: RECEIPTS_DISK
+        value: public
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_DEFAULT_REGION
+        value: ap-southeast-1
+      - key: AWS_BUCKET
+        sync: false

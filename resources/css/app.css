@@ -4,8 +4,25 @@
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
+@source '../../public/js/**/*.js';
+
+/* Dark mode mengikuti kelas `.dark` pada <html> (bukan prefers-color-scheme). */
+@custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+/*
+ | Kompatibilitas perilaku Tailwind v3: warna border default abu-abu
+ | (Tailwind v4 memakai currentColor bila kelas warna border tidak ditulis).
+ */
+@layer base {
+    *,
+    ::before,
+    ::after,
+    ::backdrop {
+        border-color: var(--color-slate-200);
+    }
 }

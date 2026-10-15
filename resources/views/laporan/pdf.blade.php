@@ -58,7 +58,7 @@
 </table>
     </div>
     <div class="header1">
-        <h3>LAPORAN KAS</h3>
+        <h3>LAPORAN KAS PERUSAHAAN</h3>
         <p>Periode: {{ $start->translatedFormat('d F Y') }} - {{ $end->translatedFormat('d F Y') }}</p>
     </div>
 

@@ -13,7 +13,7 @@
         @if ($query === '')
             <p class="text-sm text-slate-500">Masukkan kata kunci pada kolom pencarian topbar untuk mencari transaksi atau proyek.</p>
         @else
-            <p class="text-sm text-slate-500 mb-6">Ditemukan {{ $transactions->count() }} transaksi dan {{ $projects->count() }} proyek matching.</p>
+            <p class="text-sm text-slate-500 mb-6">Ditemukan {{ $transactions->total() }} transaksi dan {{ $projects->total() }} proyek matching.</p>
         @endif
     </div>
 
@@ -77,6 +77,18 @@
                     <p class="text-sm text-slate-400 text-center py-6">Tidak ada transaksi yang cocok.</p>
                 @endforelse
             </div>
+
+            {{-- PAGINATION TRANSAKSI --}}
+            @if ($transactions->hasPages())
+                <div class="flex items-center justify-between gap-3 pt-4 mt-4 border-t border-slate-100 dark:border-slate-700">
+                    <p class="text-xs text-slate-400">Menampilkan {{ $transactions->count() }} dari {{ $transactions->total() }} transaksi</p>
+                    <div class="flex items-center gap-2">
+                        <a href="{{ $transactions->previousPageUrl() ?: '#' }}" class="text-xs font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-800 {{ $transactions->onFirstPage() ? 'pointer-events-none opacity-40' : '' }}">Sebelumnya</a>
+                        <span class="w-7 h-7 flex items-center justify-center rounded-md bg-slate-950 dark:bg-slate-800 text-white text-xs font-semibold">{{ $transactions->currentPage() }}</span>
+                        <a href="{{ $transactions->nextPageUrl() ?: '#' }}" class="text-xs font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-800 {{ $transactions->hasMorePages() ? '' : 'pointer-events-none opacity-40' }}">Selanjutnya</a>
+                    </div>
+                </div>
+            @endif
         </div>
 
         {{-- PROYEK MATCHES --}}
@@ -96,6 +108,18 @@
                     <p class="text-sm text-slate-400 col-span-3">Tidak ada proyek yang cocok.</p>
                 @endforelse
             </div>
+
+            {{-- PAGINATION PROYEK --}}
+            @if ($projects->hasPages())
+                <div class="flex items-center justify-between gap-3 pt-4 mt-4 border-t border-slate-100 dark:border-slate-700">
+                    <p class="text-xs text-slate-400">Menampilkan {{ $projects->count() }} dari {{ $projects->total() }} proyek</p>
+                    <div class="flex items-center gap-2">
+                        <a href="{{ $projects->previousPageUrl() ?: '#' }}" class="text-xs font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-800 {{ $projects->onFirstPage() ? 'pointer-events-none opacity-40' : '' }}">Sebelumnya</a>
+                        <span class="w-7 h-7 flex items-center justify-center rounded-md bg-slate-950 dark:bg-slate-800 text-white text-xs font-semibold">{{ $projects->currentPage() }}</span>
+                        <a href="{{ $projects->nextPageUrl() ?: '#' }}" class="text-xs font-medium text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-800 {{ $projects->hasMorePages() ? '' : 'pointer-events-none opacity-40' }}">Selanjutnya</a>
+                    </div>
+                </div>
+            @endif
         </div>
     @endif
 </div>

@@ -17,6 +17,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Receipt / Proof Disk
+    |--------------------------------------------------------------------------
+    |
+    | Disk tempat menyimpan bukti transaksi. Default "public" (lokal), tetapi
+    | dapat dialihkan ke object storage (mis. S3/R2) lewat env RECEIPTS_DISK
+    | agar file tidak hilang saat redeploy pada disk yang bersifat ephemeral.
+    |
+    */
+
+    'receipts' => env('RECEIPTS_DISK', 'public'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Filesystem Disks
     |--------------------------------------------------------------------------
     |

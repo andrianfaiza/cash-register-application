@@ -1,0 +1,17 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+
+    level: 5
+
+    # Baca method casts() pada model (default Larastan: false), sehingga
+    # atribut seperti tanggal bertipe Carbon, bukan string.
+    parseModelCastsMethod: true
+
+    # Baca skema dari migration agar nullability kolom (mis. proyek_id nullable)
+    # dikenali, sehingga relasi bertipe Project|null secara akurat.
+    databaseMigrationsPath:
+        - database/migrations

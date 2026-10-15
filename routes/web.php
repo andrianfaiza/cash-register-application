@@ -4,10 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\KasController;
 
 Route::get('/', [KasController::class, 'showAuth'])->name('home');
-Route::get('login', [KasController::class, 'showAuth'])->name('login.page');
-Route::get('register', [KasController::class, 'showAuth'])->name('register.page');
-Route::post('login', [KasController::class, 'login'])->name('login');
-Route::post('register', [KasController::class, 'register'])->name('register');
+Route::get('login', [KasController::class, 'showAuth'])->name('login');
+Route::get('register', [KasController::class, 'showAuth'])->name('register');
+Route::post('login', [KasController::class, 'login'])->name('login.attempt');
+Route::post('register', [KasController::class, 'register'])->name('register.store');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [KasController::class, 'dashboard'])->name('dashboard');

@@ -2,11 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ ($mode ?? 'login') === 'register' ? 'Daftar' : 'Masuk' }} - KAS | PT. Winner Nusantara Jaya</title>
 
-    {{-- Tailwind CSS (CDN) --}}
-    <script src="https://cdn.tailwindcss.com"></script>
+    {{-- Tailwind CSS & aset via Vite --}}
+    @vite(['resources/css/app.css'])
 
     <style>
         /* Alpine: sembunyikan elemen ber- x-cloak sampai Alpine siap */

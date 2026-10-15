@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Project;
 use App\Models\LoginActivity;
+use App\Models\Project;
 use App\Models\Setting;
 use App\Models\Transaction;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class KasController extends Controller
 {
@@ -91,7 +93,7 @@ class KasController extends Controller
             $end = $start->copy()->endOfWeek();
 
             return [
-                'label' => 'Minggu ' . (5 - $offset),
+                'label' => 'Minggu '.(5 - $offset),
                 'masuk' => (clone $successful)->where('tipe', 'masuk')->whereBetween('tanggal', [$start, $end])->sum('nominal'),
                 'keluar' => (clone $successful)->where('tipe', 'keluar')->whereBetween('tanggal', [$start, $end])->sum('nominal'),
             ];
@@ -110,12 +112,11 @@ class KasController extends Controller
             ->orderByDesc('saldo')
             ->get();
         $recentTransactions = Transaction::query()->latest('tanggal')->latest('id')->limit(5)->get();
-        $activeProjects = Project::query()->where('status', 'aktif')->latest()->get()->map(function (Project $project) {
-            $spent = Transaction::query()->where('proyek_id', $project->id)->where('tipe', 'keluar')->where('status', 'Sukses')->sum('nominal');
-            $project->spent = $spent;
-            $project->progress = $project->pagu_anggaran > 0 ? min(100, round(($spent / $project->pagu_anggaran) * 100)) : 0;
-            return $project;
-        });
+        $activeProjects = Project::query()
+            ->where('status', 'aktif')
+            ->withSum(['transactions as spent' => fn ($query) => $query->where('tipe', 'keluar')->where('status', 'Sukses')], 'nominal')
+            ->latest()
+            ->get();
 
         $totalProjectBudget = $activeProjects->sum('pagu_anggaran');
         $totalProjectSpent = $activeProjects->sum('spent');
@@ -156,7 +157,7 @@ class KasController extends Controller
                 'tanggal_formatted' => $t->tanggal->format('d M Y'),
                 'kategori' => $t->kategori,
                 'proyek_id' => $t->proyek_id,
-                'proyek_nama' => $t->project?->nama_proyek ?? 'Non-Proyek',
+                'proyek_nama' => data_get($t, 'project.nama_proyek') ?? 'Non-Proyek',
                 'deskripsi' => $t->deskripsi,
                 'rekening_id' => $t->rekening_id,
                 'status' => $t->status,
@@ -190,7 +191,7 @@ class KasController extends Controller
         ]);
 
         if ($request->hasFile('bukti')) {
-            $data['bukti'] = $request->file('bukti')->store('bukti-transaksi', 'public');
+            $data['bukti'] = $request->file('bukti')->store('bukti-transaksi', config('filesystems.receipts'));
         }
 
         $data['status'] = 'Sukses';
@@ -214,9 +215,9 @@ class KasController extends Controller
 
         if ($request->hasFile('bukti')) {
             if ($transaction->bukti) {
-                Storage::disk('public')->delete($transaction->bukti);
+                Storage::disk(config('filesystems.receipts'))->delete($transaction->bukti);
             }
-            $data['bukti'] = $request->file('bukti')->store('bukti-transaksi', 'public');
+            $data['bukti'] = $request->file('bukti')->store('bukti-transaksi', config('filesystems.receipts'));
         }
 
         $transaction->update($data);
@@ -224,13 +225,13 @@ class KasController extends Controller
         return redirect()->route('transaksi')->with('success', 'Transaksi berhasil diperbarui.');
     }
 
-    public function transactionProof(Transaction $transaction)
+    public function transactionProof(Transaction $transaction): StreamedResponse
     {
-        abort_unless($transaction->bukti && Storage::disk('public')->exists($transaction->bukti), 404);
+        $disk = Storage::disk(config('filesystems.receipts'));
 
-        return response()->file(Storage::disk('public')->path($transaction->bukti), [
-            'Content-Disposition' => 'inline; filename="' . basename($transaction->bukti) . '"',
-        ]);
+        abort_unless($transaction->bukti && $disk->exists($transaction->bukti), 404);
+
+        return $disk->response($transaction->bukti, basename($transaction->bukti));
     }
 
     public function destroyTransactions(Request $request): RedirectResponse
@@ -242,24 +243,22 @@ class KasController extends Controller
 
         $transactions = Transaction::query()->whereIn('id', $request->input('ids'))->get();
 
+        // Hapus per-model (bukan mass delete) agar event soft delete + audit log tetap tercatat.
+        // File bukti sengaja tidak dihapus agar transaksi masih bisa dipulihkan; file baru
+        // dihapus saat force delete lewat hook di model Transaction.
         foreach ($transactions as $transaction) {
-            if ($transaction->bukti) {
-                Storage::disk('public')->delete($transaction->bukti);
-            }
+            $transaction->delete();
         }
 
-        Transaction::query()->whereIn('id', $request->input('ids'))->delete();
-
-        return redirect()->route('transaksi')->with('success', count($request->input('ids')) . ' transaksi berhasil dihapus.');
+        return redirect()->route('transaksi')->with('success', count($request->input('ids')).' transaksi berhasil dihapus.');
     }
 
     public function projects(): View
     {
-        $projects = Project::query()->latest()->get()->map(function (Project $project) {
-            $project->spent = Transaction::query()->where('proyek_id', $project->id)->where('tipe', 'keluar')->where('status', 'Sukses')->sum('nominal');
-            $project->progress = $project->pagu_anggaran > 0 ? min(100, round(($project->spent / $project->pagu_anggaran) * 100)) : 0;
-            return $project;
-        });
+        $projects = Project::query()
+            ->withSum(['transactions as spent' => fn ($query) => $query->where('tipe', 'keluar')->where('status', 'Sukses')], 'nominal')
+            ->latest()
+            ->get();
         $totalBudget = $projects->sum('pagu_anggaran');
         $totalSpent = $projects->sum('spent');
 
@@ -280,7 +279,7 @@ class KasController extends Controller
             'totalBudget' => $totalBudget,
             'totalSpent' => $totalSpent,
             'remainingBudget' => max(0, $totalBudget - $totalSpent),
-            'persentaseRealisasi' => $totalBudget > 0 ? round(($totalSpent / $totalBudget) * 100, 1) . '%' : '0%',
+            'persentaseRealisasi' => $totalBudget > 0 ? round(($totalSpent / $totalBudget) * 100, 1).'%' : '0%',
         ]);
     }
 
@@ -292,16 +291,19 @@ class KasController extends Controller
         $maxFlow = max(1, $periodTransactions->groupBy(fn ($transaction) => $transaction->tanggal->format('Y-m-d'))->map(fn ($items) => abs($items->sum(fn ($item) => $item->tipe === 'masuk' ? $item->nominal : -$item->nominal)))->max() ?: 1);
         $flux = $periodTransactions->groupBy(fn ($transaction) => $transaction->tanggal->format('Y-m-d'))->sortKeys()->map(function ($items, $date) use ($maxFlow) {
             $value = $items->sum(fn ($item) => $item->tipe === 'masuk' ? $item->nominal : -$item->nominal);
+
             return ['label' => Carbon::parse($date)->format('d M'), 'value' => $value, 'height' => round((abs($value) / $maxFlow) * 100)];
         })->values();
         $totalOut = max(1, $periodTransactions->where('tipe', 'keluar')->sum('nominal'));
         $composition = $periodTransactions->where('tipe', 'keluar')->groupBy('kategori')->map(function ($items, $category) use ($totalOut) {
             $amount = $items->sum('nominal');
+
             return ['name' => $category, 'amount' => $amount, 'percent' => round(($amount / $totalOut) * 100, 1)];
         })->sortByDesc('amount')->values();
         $recap = $periodTransactions->groupBy('rekening_id')->map(function ($items, $account) {
             $income = $items->where('tipe', 'masuk')->sum('nominal');
             $expense = $items->where('tipe', 'keluar')->sum('nominal');
+
             return ['account' => $account ?: 'Tidak ditentukan', 'initial' => 0, 'income' => $income, 'expense' => $expense, 'final' => $income - $expense];
         })->values();
 
@@ -317,7 +319,7 @@ class KasController extends Controller
             'pagu_anggaran' => ['required', 'integer', 'min:0'],
             'tanggal_mulai' => ['nullable', 'date'],
             'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
-            'project_lead_id' => ['nullable', 'integer'],
+            'project_lead_id' => ['nullable', 'integer', 'exists:users,id'],
             'departemen' => ['nullable', 'array'],
             'departemen.*' => ['string', 'max:100'],
         ]);
@@ -336,7 +338,7 @@ class KasController extends Controller
             'pagu_anggaran' => ['required', 'integer', 'min:0'],
             'tanggal_mulai' => ['nullable', 'date'],
             'tanggal_selesai' => ['nullable', 'date', 'after_or_equal:tanggal_mulai'],
-            'project_lead_id' => ['nullable', 'integer'],
+            'project_lead_id' => ['nullable', 'integer', 'exists:users,id'],
             'departemen' => ['nullable', 'array'],
             'departemen.*' => ['string', 'max:100'],
         ]);
@@ -355,7 +357,7 @@ class KasController extends Controller
 
         Project::query()->whereIn('id', $request->input('ids'))->delete();
 
-        return redirect()->route('proyek')->with('success', count($request->input('ids')) . ' proyek berhasil dihapus.');
+        return redirect()->route('proyek')->with('success', count($request->input('ids')).' proyek berhasil dihapus.');
     }
 
     public function settings(): View
@@ -377,6 +379,7 @@ class KasController extends Controller
         $data['notif_email'] = $request->boolean('notif_email');
         $data['notif_sistem'] = $request->boolean('notif_sistem');
         Setting::query()->firstOrCreate([])->update($data);
+        Cache::forget('app_settings');
 
         return redirect()->route('settings')->with('success', 'Preferensi berhasil disimpan.');
     }
@@ -449,52 +452,65 @@ class KasController extends Controller
         $projects = collect();
 
         if ($query !== '') {
+            // Escape wildcard LIKE agar karakter % dan _ dari pengguna tidak dianggap pola.
+            $term = '%'.addcslashes($query, '%_\\').'%';
+
             $transactions = Transaction::query()
-                ->where('deskripsi', 'like', "%{$query}%")
-                ->orWhere('kategori', 'like', "%{$query}%")
-                ->orWhere('rekening_id', 'like', "%{$query}%")
+                ->where(function ($builder) use ($term) {
+                    $builder->where('deskripsi', 'like', $term)
+                        ->orWhere('kategori', 'like', $term)
+                        ->orWhere('rekening_id', 'like', $term);
+                })
                 ->latest('tanggal')
-                ->get();
+                ->paginate(15, ['*'], 'transaksi_page')
+                ->withQueryString();
 
             $projects = Project::query()
-                ->where('nama_proyek', 'like', "%{$query}%")
-                ->orWhere('kategori_proyek', 'like', "%{$query}%")
-                ->orWhere('deskripsi', 'like', "%{$query}%")
+                ->where(function ($builder) use ($term) {
+                    $builder->where('nama_proyek', 'like', $term)
+                        ->orWhere('kategori_proyek', 'like', $term)
+                        ->orWhere('deskripsi', 'like', $term);
+                })
                 ->latest()
-                ->get();
+                ->paginate(12, ['*'], 'proyek_page')
+                ->withQueryString();
         }
 
         return view('search', compact('query', 'transactions', 'projects'));
     }
 
-    public function exportExcel(Request $request)
+    public function exportExcel(Request $request): StreamedResponse
     {
-        $transactions = Transaction::query()->with('project')->latest('tanggal')->get();
-        $filename = 'laporan-kas-' . now()->format('Y-m-d') . '.csv';
+        $filename = 'laporan-kas-'.now()->format('Y-m-d').'.csv';
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ];
 
-        $callback = function () use ($transactions) {
+        // Streaming + lazy() agar ingatan tetap konstan walau data transaksi besar.
+        $callback = function () {
             $file = fopen('php://output', 'w');
-            fputs($file, "\xEF\xBB\xBF");
+            fwrite($file, "\xEF\xBB\xBF");
             fputcsv($file, ['ID', 'Tanggal', 'Tipe', 'Kategori', 'Proyek', 'Rekening', 'Status', 'Nominal', 'Deskripsi']);
 
-            foreach ($transactions as $t) {
-                fputcsv($file, [
-                    $t->id,
-                    $t->tanggal->format('Y-m-d'),
-                    ucfirst($t->tipe),
-                    ucfirst($t->kategori),
-                    $t->project?->nama_proyek ?? 'Non-Proyek',
-                    $t->rekening_id ?? '-',
-                    $t->status,
-                    $t->nominal,
-                    $t->deskripsi,
-                ]);
-            }
+            Transaction::query()
+                ->with('project')
+                ->latest('tanggal')
+                ->lazy()
+                ->each(function (Transaction $t) use ($file) {
+                    fputcsv($file, [
+                        $t->id,
+                        $t->tanggal->format('Y-m-d'),
+                        ucfirst($t->tipe),
+                        ucfirst($t->kategori),
+                        data_get($t, 'project.nama_proyek') ?? 'Non-Proyek',
+                        $t->rekening_id ?? '-',
+                        $t->status,
+                        $t->nominal,
+                        $t->deskripsi,
+                    ]);
+                });
 
             fclose($file);
         };

@@ -2,17 +2,11 @@
 <html lang="{{ $appSettings->bahasa ?? 'id' }}" class="{{ ($appSettings->mode_tampilan ?? 'light') === 'dark' ? 'dark' : '' }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title')</title>
 	@vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr" defer></script>
-    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js" defer></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-        };
         window.__APP_SETTINGS__ = {
             bahasa: "{{ $appSettings->bahasa ?? 'id' }}",
             mata_uang: "{{ $appSettings->mata_uang ?? 'idr' }}",
