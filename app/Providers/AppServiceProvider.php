@@ -29,6 +29,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        if ($this->app->runningInConsole() && ! $this->app->runningUnitTests()) {
+            return;
+        }
+
         if (Schema::hasTable('settings')) {
             $setting = Cache::rememberForever('app_settings', fn () => Setting::query()->firstOrCreate([]));
             View::share('appSettings', $setting);

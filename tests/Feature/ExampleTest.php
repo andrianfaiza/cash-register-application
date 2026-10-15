@@ -16,4 +16,12 @@ class ExampleTest extends TestCase
 
         $response->assertStatus(200);
     }
+
+    public function test_registration_page_renders_in_register_mode(): void
+    {
+        $response = $this->get('/register');
+
+        $response->assertOk();
+        $response->assertSee('Buat Akun Baru');
+    }
 }

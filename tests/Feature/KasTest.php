@@ -210,7 +210,7 @@ class KasTest extends TestCase
 
         $responseExcel = $this->actingAs($user)->get('/laporan/export-excel');
         $responseExcel->assertStatus(200);
-        $responseExcel->assertHeader('content-type', 'text/csv; charset=UTF-8');
+        $responseExcel->assertHeader('content-type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 
         $responsePdf = $this->actingAs($user)->get('/laporan/export-pdf');
         $responsePdf->assertStatus(200);

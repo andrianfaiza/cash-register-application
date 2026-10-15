@@ -58,8 +58,8 @@
                 showConfirmPw: false,
 
                 urls: {
-                    login: @json(route('login.page')),
-                    register: @json(route('register.page')),
+                    login: @json(route('login')),
+                    register: @json(route('register')),
                 },
 
                 copy: {

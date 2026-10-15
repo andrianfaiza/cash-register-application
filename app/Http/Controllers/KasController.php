@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\TransactionsExport;
 use App\Models\LoginActivity;
 use App\Models\Project;
 use App\Models\Setting;
@@ -16,6 +17,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class KasController extends Controller
@@ -50,7 +53,7 @@ class KasController extends Controller
     public function showAuth(Request $request): View
     {
         return view('auth', [
-            'mode' => $request->routeIs('register.page') ? 'register' : 'login',
+            'mode' => $request->routeIs('register') ? 'register' : 'login',
         ]);
     }
 
@@ -479,43 +482,11 @@ class KasController extends Controller
         return view('search', compact('query', 'transactions', 'projects'));
     }
 
-    public function exportExcel(Request $request): StreamedResponse
+    public function exportExcel(): BinaryFileResponse
     {
-        $filename = 'laporan-kas-'.now()->format('Y-m-d').'.csv';
+        $filename = 'laporan-kas-'.now()->format('Y-m-d').'.xlsx';
 
-        $headers = [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
-        ];
-
-        // Streaming + lazy() agar ingatan tetap konstan walau data transaksi besar.
-        $callback = function () {
-            $file = fopen('php://output', 'w');
-            fwrite($file, "\xEF\xBB\xBF");
-            fputcsv($file, ['ID', 'Tanggal', 'Tipe', 'Kategori', 'Proyek', 'Rekening', 'Status', 'Nominal', 'Deskripsi']);
-
-            Transaction::query()
-                ->with('project')
-                ->latest('tanggal')
-                ->lazy()
-                ->each(function (Transaction $t) use ($file) {
-                    fputcsv($file, [
-                        $t->id,
-                        $t->tanggal->format('Y-m-d'),
-                        ucfirst($t->tipe),
-                        ucfirst($t->kategori),
-                        data_get($t, 'project.nama_proyek') ?? 'Non-Proyek',
-                        $t->rekening_id ?? '-',
-                        $t->status,
-                        $t->nominal,
-                        $t->deskripsi,
-                    ]);
-                });
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return Excel::download(new TransactionsExport, $filename);
     }
 
     public function exportPdf(Request $request): View
